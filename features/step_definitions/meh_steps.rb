@@ -1,6 +1,6 @@
 When /^(?:|I )request a payment$/ do
   params = {
-    "email"=>"meh@meh.com"
+    "email"=>"meh@gmail.com"
   }
   post "/tasks/payment_requests/create", params
 end
