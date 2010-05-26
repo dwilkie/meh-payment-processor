@@ -1,0 +1,6 @@
+*~
+rerun.txt
+bin/**
+WEB-INF/**
+public/**
+.gems
