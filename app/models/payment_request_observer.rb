@@ -3,11 +3,11 @@ class PaymentRequestObserver
   observe PaymentRequest
   
   after :create do
-    puts self.params.inspect
+    params = {"id" => self.id, "params" => self.params}
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :params => self.params,
-      :url => '/tasks/payment_requests/update'
+      :params => {"params" => params.inspect},
+      :url => '/tasks/requester_application/payment_requests/show'
     )
   end
 end

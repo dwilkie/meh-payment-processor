@@ -1,2 +1,2 @@
 development:
-  meh_payment_request_url: "localhost:3000/payment_requests/update"
+  requester_application_uri: "http://localhost:3000"

@@ -28,7 +28,6 @@ module Pickle
   def find_model(a_model_name, fields = nil)
     model_class = a_model_name.classify.constantize
     fields = parse_fields(fields)
-    puts model_class.inspect
     model_class.first(fields)
   end
   

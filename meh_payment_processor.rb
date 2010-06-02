@@ -4,7 +4,9 @@ require 'dm-timestamps'
 require 'dm-validations'
 require 'dm-observer'
 require 'dm-types'
+require 'dm-extlib'
 require './app/models/payment_request'
+require './app/models/supplier'
 require './app/models/payment_request_observer'
 
 class MehPaymentProcessor < Sinatra::Base
@@ -13,20 +15,34 @@ class MehPaymentProcessor < Sinatra::Base
     File.read('config/app_settings.yml')
   )[environment.to_s]
 
-  get '/' do
-    "maggot"
-  end
-  
+  # All uri's starting with /task are private for the
+  # task queue. NOTE: never use create! with DM because
+  # it will bypass hooks and the observer will not be run
   post '/tasks/payment_requests/create' do
-    PaymentRequest.create(:email => params[:email], :params => params)
+    PaymentRequest.create(:to => params["to"], :params => params)
   end
   
-  put '/tasks/payment_requests/update' do
-    AppEngine::URLFetch.fetch(
-      app_settings['meh_payment_request_url'], :method => 'PUT'
+  post '/tasks/requester_application/payment_requests/show' do
+    # because the TaskQueue doesn't support hashes of hashes we passed
+    # entire hash as as string. And we use eval to get it back to a hash of hashes
+    parsed_params = eval(params["params"])
+    payment_request = PaymentRequest.get(parsed_params["id"])
+    puts URI.join(
+      app_settings['requester_application_uri'],
+      'payment_requests/show'
+    ).to_s << parsed_params.to_params
+    response = AppEngine::URLFetch.fetch(
+      URI.join(
+        app_settings['requester_application_uri'],
+        'payment_requests/show'
+      ).to_s
     )
+    puts response.inspect
   end
 
+  # External request is executed here
+  # We just delegate the work to /tasks/payment_requests/create
+  # for a later time to ensure a fast response time
   post '/payment_requests/create' do
     # Schedule the creation of a payment request to the queue
     AppEngine::Labs::TaskQueue.add(
@@ -34,9 +50,6 @@ class MehPaymentProcessor < Sinatra::Base
       :params => params,
       :url => '/tasks/payment_requests/create'
     )
-    redirect '/'
   end
   
-  private
-
 end

@@ -11,8 +11,10 @@ DataMapper.setup(:default, 'sqlite3::memory:')
 DataMapper.auto_migrate!
 
 class MyWorld
+  require File.join(File.dirname(__FILE__), './pickle')
+  include Pickle
   include Rack::Test::Methods
-
+  
   def app
     MehPaymentProcessor
   end

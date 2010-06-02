@@ -1,10 +1,17 @@
-When /^(?:|I )request a payment$/ do
-  params = {
-    "email"=>"meh@gmail.com"
-  }
-  post "/tasks/payment_requests/create", params
+Given /^a payment request exists(?: (.+))?$/ do |fields|
+  fields = parse_fields(fields)
+  PaymentRequest.create(:to => fields["to"], :params => fields)
 end
 
-Then /^there should be a payment request$/ do
-  PaymentRequest.all.count.should == 1
+When /^a payment is requested(?: (.+))?$/ do |fields|
+  post "/tasks/payment_requests/create", parse_fields(fields)
+end
+
+Then(/^a payment request should exist(?: with (.+))?$/) do |fields|
+  find_model!("payment_request", fields)
+end
+
+Then /^the payment request should have the following parameters: (.+)$/ do |params|
+  payment_request = PaymentRequest.last
+  payment_request.params.should == parse_fields(params)
 end
