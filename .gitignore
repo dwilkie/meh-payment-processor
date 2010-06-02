@@ -4,3 +4,5 @@ bin/**
 WEB-INF/**
 public/**
 .gems
+.bundle
+vendor

@@ -7,6 +7,11 @@ When /^a payment is requested(?: (.+))?$/ do |fields|
   post "/tasks/payment_requests/create", parse_fields(fields)
 end
 
+When /^I blah$/ do
+  post "/tasks/requester_application/payment_requests/show",
+    {"params" => "{\"params\" => {\"to\" =>\"me@gmail.com\", \"whatever\"=>\"maggot\"}}"}
+end
+
 Then(/^a payment request should exist(?: with (.+))?$/) do |fields|
   find_model!("payment_request", fields)
 end

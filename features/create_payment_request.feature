@@ -10,4 +10,7 @@ Feature: Create Payment Request
     
   Scenario: Send the parameters back to the main application for verification
     Given a payment request exists to: "someone@gmail.com", amount: "5000.00", currency: "THB", something_else: "This could be anything"
+    
+  Scenario: Meh
+  When I blah
 
