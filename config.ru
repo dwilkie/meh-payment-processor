@@ -1,8 +1,8 @@
 require 'appengine-rack'
 require 'dm-core'
+require 'meh_payment_processor'
 require 'appengine-apis/labs/taskqueue'
 require 'appengine-apis/urlfetch'
-require 'meh_payment_processor'
 
 AppEngine::Rack.configure_app(
   :application => 'meh-payment-processor',

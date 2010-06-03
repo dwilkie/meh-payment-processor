@@ -26,18 +26,12 @@ class MehPaymentProcessor < Sinatra::Base
     # because the TaskQueue doesn't support hashes of hashes we passed
     # entire hash as as string. And we use eval to get it back to a hash of hashes
     parsed_params = eval(params["params"])
-    #payment_request = PaymentRequest.get(parsed_params["id"])
-    puts URI.join(
+    payment_request = PaymentRequest.get(parsed_params["id"])
+    uri = URI.join(
       app_settings['requester_application_uri'],
       'payment_requests/show'
     ).to_s << '?' << parsed_params["params"].to_params
-    response = AppEngine::URLFetch.fetch(
-      URI.join(
-        app_settings['requester_application_uri'],
-        'payment_requests/show'
-      ).to_s
-    )
-    puts response.inspect
+    AppEngine::URLFetch.fetch(uri)
   end
 
   # External request is executed here

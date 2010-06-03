@@ -6,7 +6,10 @@ Sinatra::Application.app_file = app_file
 require 'rspec/expectations'
 require 'rack/test'
 require 'dm-core'
+require 'fakeweb'
+require 'httparty'
 
+FakeWeb.allow_net_connect = false
 DataMapper.setup(:default, 'sqlite3::memory:')
 DataMapper.auto_migrate!
 
@@ -16,7 +19,7 @@ class MyWorld
   include Rack::Test::Methods
   
   def app
-    MehPaymentProcessor
+    MehPaymentProcessor.set :environment, :test
   end
 end
 
