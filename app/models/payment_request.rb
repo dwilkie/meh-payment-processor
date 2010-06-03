@@ -5,4 +5,9 @@ class PaymentRequest
   property :params, Yaml
   property :verified_at, DateTime
   timestamps :at
+  
+  def verified?
+    !verified_at.nil?
+  end
+  
 end

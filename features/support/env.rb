@@ -8,6 +8,7 @@ require 'rack/test'
 require 'dm-core'
 require 'fakeweb'
 require 'httparty'
+require 'ruby-debug'
 
 FakeWeb.allow_net_connect = false
 DataMapper.setup(:default, 'sqlite3::memory:')

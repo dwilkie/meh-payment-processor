@@ -23,15 +23,18 @@ class MehPaymentProcessor < Sinatra::Base
   end
   
   post '/tasks/requester_application/payment_requests/show' do
-    # because the TaskQueue doesn't support hashes of hashes we passed
-    # entire hash as as string. And we use eval to get it back to a hash of hashes
-    parsed_params = eval(params["params"])
-    payment_request = PaymentRequest.get(parsed_params["id"])
+    payment_request = PaymentRequest.get(params["id"])
     uri = URI.join(
       app_settings['requester_application_uri'],
       'payment_requests/show'
-    ).to_s << '?' << parsed_params["params"].to_params
-    AppEngine::URLFetch.fetch(uri)
+    )
+    uri.query = payment_request.params.to_params
+    uri.scheme = "https" # force HTTPS
+    uri = uri.to_s
+    response = AppEngine::URLFetch.fetch(uri, :method => 'HEAD')
+    if response.code == "200"
+      payment_request.update(:verified_at => Time.now)
+    end
   end
 
   # External request is executed here
