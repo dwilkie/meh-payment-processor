@@ -1,7 +1,7 @@
 require 'rack/test'
 module AppEngine
   class URLFetch
-    cattr_accessor :last_request_uri
+    cattr_accessor :last_request_uri, :last_response
     def self.fetch(url, options={})
       @@last_request_uri = url
       options[:method] ||= 'GET'
@@ -11,7 +11,7 @@ module AppEngine
       
       when 'HEAD'
         response = Net::HTTP.start(uri.host, uri.port) do |http|
-          http.head(uri.request_uri)
+          @@last_response = http.head(uri.request_uri)
         end
       end
     end

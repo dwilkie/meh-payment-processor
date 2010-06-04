@@ -1,2 +1,3 @@
 development:
   requester_application_uri: "http://localhost:3000"
+  http_scheme: "http"

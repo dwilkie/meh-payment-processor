@@ -16,7 +16,9 @@ DataMapper.auto_migrate!
 
 class MyWorld
   require File.join(File.dirname(__FILE__), './pickle')
+  require File.join(File.dirname(__FILE__), './fakeweb_helper')
   include Pickle
+  include FakeWebHelper
   include Rack::Test::Methods
   
   def app

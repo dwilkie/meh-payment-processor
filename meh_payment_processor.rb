@@ -24,12 +24,14 @@ class MehPaymentProcessor < Sinatra::Base
   
   post '/tasks/requester_application/payment_requests/show' do
     payment_request = PaymentRequest.get(params["id"])
+    payment_request_params = payment_request.params
+    payment_request_remote_id = payment_request_params["id"]
     uri = URI.join(
       app_settings['requester_application_uri'],
-      'payment_requests/show'
+      "payment_request/#{payment_request_remote_id}"
     )
-    uri.query = payment_request.params.to_params
-    uri.scheme = "https" # force HTTPS
+    uri.query = payment_request_params.to_params
+    uri.scheme = app_settings['http_scheme'] # force HTTPS
     uri = uri.to_s
     response = AppEngine::URLFetch.fetch(uri, :method => 'HEAD')
     if response.code == "200"
