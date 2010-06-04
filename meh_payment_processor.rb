@@ -19,18 +19,16 @@ class MehPaymentProcessor < Sinatra::Base
   # task queue. NOTE: never use create! with DM because
   # it will bypass hooks and the observer will not be run
   post '/tasks/payment_requests' do
-    PaymentRequest.create(:external_id => params["external_id"], :params => params)
+    PaymentRequest.create(:external_id => params.delete("external_id"), :params => params)
   end
   
   put '/tasks/verify_payment_request/:id' do
     payment_request = PaymentRequest.get(params[:id])
-    payment_request_params = payment_request.params
-    payment_request_external_id = payment_request_params["external_id"]
     uri = URI.join(
       app_settings['requester_application_uri'],
-      "payment_request/#{payment_request_external_id}"
+      "payment_request/#{payment_request.external_id}"
     )
-    uri.query = payment_request_params.to_params
+    uri.query = payment_request.params.to_params
     uri.scheme = app_settings['http_scheme'] # force HTTPS
     uri = uri.to_s
     response = AppEngine::URLFetch.fetch(uri, :method => 'HEAD')

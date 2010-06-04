@@ -9,4 +9,4 @@ Feature: Paypal Payment Request
   
   Scenario:
     When an incoming payment request is verified
-    Then a payment request should be made to my configured paypal account for 347752 with 
+    Then a payment request should be made to my configured paypal account 
