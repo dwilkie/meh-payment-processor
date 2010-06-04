@@ -5,8 +5,8 @@ class PaymentRequestObserver
   after :create do
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :params => {"id" => self.id.to_s},
-      :url => '/tasks/requester_application/payment_requests/show'
+      :url => "/tasks/verify_payment_request/#{self.id}",
+      :method => 'PUT'
     )
   end
 end

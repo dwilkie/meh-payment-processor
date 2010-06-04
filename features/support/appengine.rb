@@ -2,6 +2,12 @@ require 'rack/test'
 module AppEngine
   class URLFetch
     cattr_accessor :last_request_uri, :last_response
+    
+    def self.clean_registry
+      self.last_request_uri = nil
+      self.last_response = nil
+    end
+    
     def self.fetch(url, options={})
       @@last_request_uri = url
       options[:method] ||= 'GET'
@@ -21,7 +27,17 @@ module AppEngine
     class TaskQueue
       def self.add(payload, options)
         task = Task.new
-        task.post options[:url], options[:params]
+        options[:method] ||= 'POST'
+        
+        case options[:method]
+        
+        when 'POST'
+          task.post options[:url], options[:params]
+        
+        when 'PUT'
+          task.put options[:url], options[:params]
+        end
+        
         env = task.last_request.env
         error = env["sinatra.error"].to_s
         unless error.blank?

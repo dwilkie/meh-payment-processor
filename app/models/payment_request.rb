@@ -1,11 +1,13 @@
 class PaymentRequest
   include DataMapper::Resource
   property :id, Serial
-  property :to, String, :format => :email_address, :required => true
+  property :external_id, Integer, :required => true
   property :params, Yaml
   property :verified_at, DateTime
   timestamps :at
-  
+
+  validates_is_unique :external_id
+
   def verified?
     !verified_at.nil?
   end

@@ -1,11 +1,11 @@
 When /^a payment request is received(?: with (.+))?$/ do |fields|
   register_payment_request_callback_uri(["404", "Not Found"])
-  post "/payment_requests/create", parse_fields(fields)
+  post "/payment_requests", parse_fields(fields)
 end
 
 When /^the configured external application makes a payment request(?: with (.+))?$/ do |fields|
   register_payment_request_callback_uri(["200", "OK"])
-  post "/payment_requests/create", parse_fields(fields)
+  post "/payment_requests", parse_fields(fields)
 end
 
 Then(/^a (\w+) should (?:be created|exist)(?: with (.+))?$/) do |model_name, fields|

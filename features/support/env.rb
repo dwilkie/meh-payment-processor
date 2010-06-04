@@ -9,6 +9,10 @@ require 'dm-core'
 require 'fakeweb'
 require 'httparty'
 require 'ruby-debug'
+require 'database_cleaner'
+require 'database_cleaner/cucumber'
+
+DatabaseCleaner.strategy = :transaction
 
 FakeWeb.allow_net_connect = false
 DataMapper.setup(:default, 'sqlite3::memory:')
