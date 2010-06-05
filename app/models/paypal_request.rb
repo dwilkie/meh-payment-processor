@@ -3,6 +3,9 @@ class PaypalRequest
   REQUEST_DATA_FORMAT = "NV"
   RESPONSE_DATA_FORMAT = "NV"
 
+  attr_reader :response
+  attr_reader :raw_response
+
   def initialize(api_credentials)
     @username = api_credentials['api_username']
     @password = api_credentials['api_password']
@@ -28,18 +31,15 @@ class PaypalRequest
     request_body.merge!(params)
     request_body = stringify_body(request_body)
 
-    @payment_response = AppEngine::URLFetch.fetch(
+    @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,
       :method => 'POST',
       :payload => request_body,
       :headers => headers
     )
+    @response = @raw_response.body
   end
-  
-  def success?
-    
-  end
-  
+
   private
     def headers
       {

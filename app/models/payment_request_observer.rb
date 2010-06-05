@@ -18,4 +18,11 @@ class PaymentRequestObserver
     )
   end
   
+  after :complete do
+    AppEngine::Labs::TaskQueue.add(
+      self.payment_response,
+      :url => "/tasks/external_application/payment_request/#{self.external_id}",
+      :method => 'PUT'
+    )
+  end
 end

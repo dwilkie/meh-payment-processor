@@ -1,7 +1,8 @@
 module FakeWebHelper
-  def register_payment_request_callback_uri(status)
+  def register_external_payment_request_uri(method, status)
     FakeWeb.register_uri(
-      :head, %r|http://localhost:3000/payment_request/\d+\?[^\s\?]+|,
+      method,
+      %r|http://localhost:3000/payment_request/\d+(?:\?[^\s\?]+)?|,
       :status => status
     )
   end
@@ -19,10 +20,12 @@ module FakeWebHelper
     )
   end
   
-  def payment_request_callback_uri(id, fields)
-    "http://localhost:3000/payment_request/#{id}?#{fields.to_params}"
+  def external_payment_request_uri(id, fields=nil)
+    uri = "http://localhost:3000/payment_request/#{id}"
+    uri << "?#{fields.to_params}" if fields
+    uri
   end
-  
+
   def paypal_payments_uri
     "https://svcs.sandbox.paypal.com/AdaptivePayments/Pay"
   end

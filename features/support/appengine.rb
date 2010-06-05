@@ -18,13 +18,18 @@ module AppEngine
       case options[:method]
 
       when 'HEAD'
-        self.responses[url] = http_server.start do |http|
+        self.responses["HEAD #{url}"] = http_server.start do |http|
           http.head(uri.request_uri)
         end
       
       when 'POST'
-        self.responses[url] = http_server.start do |http|
+        self.responses["POST #{url}"] = http_server.start do |http|
           http.post(uri.request_uri, options[:payload], options[:headers])
+        end
+        
+      when 'PUT'
+        self.responses["PUT #{url}"] = http_server.start do |http|
+          http.put(uri.request_uri, options[:payload], options[:headers])
         end
       end
     end
@@ -42,7 +47,7 @@ module AppEngine
           task.post options[:url], options[:params]
         
         when 'PUT'
-          task.put options[:url], options[:params]
+          task.put options[:url], payload
         end
         
         env = task.last_request.env
