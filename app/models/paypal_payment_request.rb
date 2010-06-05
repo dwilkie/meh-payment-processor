@@ -1,4 +1,5 @@
-class PaypalRequest
+# Represents a PaymentRequest on the Paypal side
+class PaypalPaymentRequest
 
   REQUEST_DATA_FORMAT = "NV"
   RESPONSE_DATA_FORMAT = "NV"

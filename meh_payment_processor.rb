@@ -7,9 +7,8 @@ require 'dm-types'
 require './lib/dm_extlib_hash'
 require './app/models/payment_request'
 require './app/models/payment_request_observer'
-require './app/models/paypal_request'
-require './app/models/payment_verification'
-require './app/models/payment_notification'
+require './app/models/external_payment_request'
+require './app/models/paypal_payment_request'
 
 class MehPaymentProcessor < Sinatra::Base
 
@@ -28,12 +27,12 @@ class MehPaymentProcessor < Sinatra::Base
     200
   end
   
-  put '/tasks/verify_payment_request/:id' do
+  put '/tasks/verify/payment_request/:id' do
     payment_request = PaymentRequest.get(params[:id])
-    payment_verification = PaymentVerification.new(
+    external_payment_request = ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
     )
-    if payment_verification.verify(
+    if external_payment_request.verified?(
       payment_request.external_id,
       payment_request.params
     )
@@ -42,10 +41,12 @@ class MehPaymentProcessor < Sinatra::Base
     200
   end
 
-  put '/tasks/process_payment_request/:id' do
+  put '/tasks/process/payment_request/:id' do
     payment_request = PaymentRequest.get(params[:id])
-    paypal_request = PaypalRequest.new(app_settings['paypal']['api_credentials'])
-    response = paypal_request.pay(
+    paypal_payment_request = PaypalPaymentRequest.new(
+      app_settings['paypal']['api_credentials']
+    )
+    response = paypal_payment_request.pay(
       app_settings['paypal']['uri'],
       app_settings['my_application']['uri'],
       app_settings['my_application']['uri'],
@@ -55,11 +56,10 @@ class MehPaymentProcessor < Sinatra::Base
     200
   end
   
-  put '/tasks/external_application/payment_request/:id' do
-    PaymentNotification.new(
+  put '/tasks/external_payment_request/:id' do
+    ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
     ).notify(params[:id], request.env["rack.input"].read)
-    200
   end
 
   # External request is executed here
