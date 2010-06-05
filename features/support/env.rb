@@ -24,6 +24,7 @@ class MyWorld
   include Pickle
   include FakeWebHelper
   include Rack::Test::Methods
+  include Rspec::Matchers
   
   def app
     MehPaymentProcessor.set :environment, :test

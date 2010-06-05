@@ -1,3 +1,8 @@
+Given /^I have configured my app correctly for paypal$/ do
+  register_paypal_payment_request
+end
+
+
 When /^a payment request is received(?: with (.+))?$/ do |fields|
   register_payment_request_callback_uri(["404", "Not Found"])
   post "/payment_requests", parse_fields(fields)
@@ -15,19 +20,18 @@ end
 
 Then /^the payment request should (not )?be (\w+)$/ do |negative, predicate|
   payment_request = PaymentRequest.last
-  unless negative
-    payment_request.send("#{predicate}?").should_not == false
-  else
-    payment_request.send("#{predicate}?").should == false
-  end
+  negative ||= ""
+  negative = "_not" unless negative.blank?
+  payment_request.send("should#{negative}", send("be_#{predicate}"))
 end
 
-Then /^a verification request should be made to the configured external application for (\d+)(?: with (.+))?$/ do |id, fields|
+Then /^a verification request to the configured external application should return status "([^\"]*)" for (\d+)(?: with (.+))?$/ do |status, id, fields|
   fields = parse_fields(fields)
-  AppEngine::URLFetch.last_request_uri.should == payment_request_callback_uri(id, fields)
+  response = AppEngine::URLFetch.responses[payment_request_callback_uri(id, fields)]
+  response.should_not be_nil
+  "#{response.code} #{response.message}".should == status
 end
 
-Then /^the response should be status "([^\"]*)"$/ do |response_status|
-  last_response = AppEngine::URLFetch.last_response
-  "#{last_response.code} #{last_response.message}".should == response_status
+Then /^a payment request should be made to my configured paypal account$/ do
+  AppEngine::URLFetch.responses.should include(paypal_payments_uri)
 end

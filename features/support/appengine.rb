@@ -1,23 +1,30 @@
 require 'rack/test'
 module AppEngine
   class URLFetch
-    cattr_accessor :last_request_uri, :last_response
-    
+    cattr_accessor :responses
+   
     def self.clean_registry
-      self.last_request_uri = nil
-      self.last_response = nil
+      self.responses = {}
     end
     
     def self.fetch(url, options={})
-      @@last_request_uri = url
       options[:method] ||= 'GET'
       uri = URI.parse(url)
+      self.responses ||= {}
       
+      http_server =  Net::HTTP.new(uri.host, uri.port)
+      http_server.use_ssl = (uri.port == 443)
+
       case options[:method]
-      
+
       when 'HEAD'
-        response = Net::HTTP.start(uri.host, uri.port) do |http|
-          @@last_response = http.head(uri.request_uri)
+        self.responses[url] = http_server.start do |http|
+          http.head(uri.request_uri)
+        end
+      
+      when 'POST'
+        self.responses[url] = http_server.start do |http|
+          http.post(uri.request_uri, options[:payload], options[:headers])
         end
       end
     end

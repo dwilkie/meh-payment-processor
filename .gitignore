@@ -6,3 +6,4 @@ public/**
 .gems
 .bundle
 vendor
+config/development.yml

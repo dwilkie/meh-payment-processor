@@ -9,4 +9,13 @@ class PaymentRequestObserver
       :method => 'PUT'
     )
   end
+  
+  after :verify do
+    AppEngine::Labs::TaskQueue.add(
+      nil,
+      :url => "/tasks/process_payment_request/#{self.id}",
+      :method => 'PUT'
+    )
+  end
+  
 end

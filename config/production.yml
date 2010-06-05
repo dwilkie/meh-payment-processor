@@ -1,0 +1,12 @@
+my_application:
+  uri: "http://my_app_id.appspot.com"
+external_application:
+  uri: ""
+paypal:
+  uri: "https://svcs.paypal.com"
+  api_credentials:
+    api_username: "my api username"
+    api_password: "my api password"
+    signature: "my paypal signature"
+    application_id: "my app id from paypal"
+

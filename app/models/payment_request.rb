@@ -12,4 +12,8 @@ class PaymentRequest
     !verified_at.nil?
   end
   
+  def verify
+    self.update(:verified_at => Time.now)
+  end
+  
 end
