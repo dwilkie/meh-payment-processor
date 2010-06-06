@@ -74,4 +74,15 @@ class MehPaymentProcessor < Sinatra::Base
     )
     200
   end
+  
+  head '/payment_request/:id' do
+    payment_request = PaymentRequest.get(params[:id])
+    if payment_request && payment_request.completed?
+      merged_params = params.merge(:external_id => payment_request.external_id)
+      merged_params = params.merge(payment_request.params)
+      merged_params == params ? 200 : 404
+    else
+      404
+    end
+  end
 end

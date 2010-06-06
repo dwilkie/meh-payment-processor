@@ -1,4 +1,4 @@
-Feature: Incoming Payment Request
+Feature: Payment Request
   In order to pay people
   As an owner of this application
   I want to allow verified payment requests to be made to my application

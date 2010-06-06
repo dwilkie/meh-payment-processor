@@ -2,15 +2,34 @@ Given /^I have configured my app correctly for paypal$/ do
   register_paypal_payment_request
 end
 
+Given /^a (completed )?payment request exists(?: with (.+))?$/ do |completed, fields|
+  register_external_payment_request(:head, ["200", "OK"])
+  register_paypal_payment_request
+  register_external_payment_request(:put, ["200", "OK"])
+  fields = parse_fields(fields)
+  id = fields.delete("id")
+  external_id = fields.delete("external_id")
+  payment_request = PaymentRequest.create(
+    :id => id,
+    :external_id => external_id,
+    :params => fields
+  )
+  PaymentRequest.get(id).update(:completed_at => nil) unless completed
+end
+
 When /^a payment request is received(?: with (.+))?$/ do |fields|
-  register_external_payment_request_uri(:head, ["404", "Not Found"])
+  register_external_payment_request(:head, ["404", "Not Found"])
   post "/payment_requests", parse_fields(fields)
 end
 
 When /^the configured external application makes a payment request(?: with (.+))?$/ do |fields|
-  register_external_payment_request_uri(:head, ["200", "OK"])
-  register_external_payment_request_uri(:put, ["200", "OK"])
+  register_external_payment_request(:head, ["200", "OK"])
+  register_external_payment_request(:put, ["200", "OK"])
   post "/payment_requests", parse_fields(fields)
+end
+
+When /^a payment notification verification request is received for (\d+)(?: with (.+))?$/ do |id, fields|
+  @response = head "/payment_request/#{id}", parse_fields(fields)
 end
 
 Then(/^a (\w+) should (?:be created|exist)(?: with (.+))?$/) do |model_name, fields|
@@ -39,4 +58,8 @@ end
 
 Then /^a POST request should have been made to my paypal account returning status "([^\"]*)" containing the payment details$/ do |status|
   AppEngine::URLFetch.responses.should include("POST #{paypal_payments_uri}")
+end
+
+Then /^the response should be (\d+)$/ do |response|
+   @response.status.should == response.to_i
 end

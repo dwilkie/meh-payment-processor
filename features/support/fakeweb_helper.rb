@@ -1,5 +1,5 @@
 module FakeWebHelper
-  def register_external_payment_request_uri(method, status)
+  def register_external_payment_request(method, status)
     FakeWeb.register_uri(
       method,
       %r|http://localhost:3000/payment_request/\d+(?:\?[^\s\?]+)?|,
