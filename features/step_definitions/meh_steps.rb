@@ -1,7 +1,3 @@
-Given /^I have configured my app correctly for paypal$/ do
-  register_paypal_payment_request
-end
-
 Given /^a (completed )?payment request exists(?: with (.+))?$/ do |completed, fields|
   register_external_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
@@ -22,8 +18,14 @@ When /^a payment request is received(?: with (.+))?$/ do |fields|
   post "/payment_requests", parse_fields(fields)
 end
 
+When /^another payment request is received(?: with (.+))?$/ do |fields|
+  FakeWeb.clean_registry
+  post "/payment_requests", parse_fields(fields)
+end
+
 When /^the configured external application makes a payment request(?: with (.+))?$/ do |fields|
   register_external_payment_request(:head, ["200", "OK"])
+  register_paypal_payment_request
   register_external_payment_request(:put, ["200", "OK"])
   post "/payment_requests", parse_fields(fields)
 end
@@ -62,4 +64,12 @@ end
 
 Then /^the response should be (\d+)$/ do |response|
    @response.status.should == response.to_i
+end
+
+Then /^(\d) payment requests? should exist$/ do |count|
+  PaymentRequest.all.size.should == count.to_i
+end
+
+Then /^no outgoing requests should be made$/ do
+  # this is intentionally empty!
 end

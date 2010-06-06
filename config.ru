@@ -19,6 +19,10 @@ if(methods.member?("to_xml"))
   map '/tasks' do
     use AppEngine::Rack::AdminRequired
   end
+# Make admin section
+  map '/admin' do
+    use AppEngine::Rack::AdminRequired
+  end
 end
 
 run MehPaymentProcessor

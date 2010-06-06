@@ -24,7 +24,6 @@ class MehPaymentProcessor < Sinatra::Base
       :external_id => params.delete("external_id"),
       :params => params
     )
-    200
   end
   
   put '/tasks/verify/payment_request/:id' do
@@ -38,7 +37,6 @@ class MehPaymentProcessor < Sinatra::Base
     )
       payment_request.verify
     end
-    200
   end
 
   put '/tasks/process/payment_request/:id' do
@@ -53,7 +51,6 @@ class MehPaymentProcessor < Sinatra::Base
       payment_request.params
     )
     payment_request.complete(response)
-    200
   end
   
   put '/tasks/external_payment_request/:id' do
@@ -72,7 +69,6 @@ class MehPaymentProcessor < Sinatra::Base
       :params => params,
       :url => '/tasks/payment_requests'
     )
-    200
   end
   
   head '/payment_request/:id' do
@@ -84,5 +80,9 @@ class MehPaymentProcessor < Sinatra::Base
     else
       404
     end
+  end
+  
+  get '/admin/payees' do
+    "meh"
   end
 end

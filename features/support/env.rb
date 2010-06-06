@@ -3,6 +3,8 @@ require app_file
 # Force the application name because polyglot breaks the auto-detection logic.
 Sinatra::Application.app_file = app_file
 
+require 'capybara'
+require 'capybara/cucumber'
 require 'rspec/expectations'
 require 'rack/test'
 require 'dm-core'
@@ -12,8 +14,8 @@ require 'ruby-debug'
 require 'database_cleaner'
 require 'database_cleaner/cucumber'
 
+Capybara.app = MehPaymentProcessor
 DatabaseCleaner.strategy = :transaction
-
 FakeWeb.allow_net_connect = false
 DataMapper.setup(:default, 'sqlite3::memory:')
 DataMapper.auto_migrate!
