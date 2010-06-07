@@ -7,7 +7,7 @@ class PaymentRequestObserver
   after :create do
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :url => "/tasks/verify/payment_request/#{self.id}",
+      :url => "/tasks/verify/payment_requests/#{self.id}",
       :method => 'PUT'
     )
   end
@@ -17,7 +17,7 @@ class PaymentRequestObserver
   after :verify do
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :url => "/tasks/process/payment_request/#{self.id}",
+      :url => "/tasks/process/payment_requests/#{self.id}",
       :method => 'PUT'
     )
   end
@@ -27,7 +27,7 @@ class PaymentRequestObserver
   after :complete do
     AppEngine::Labs::TaskQueue.add(
       self.payment_response,
-      :url => "/tasks/external_payment_request/#{self.external_id}",
+      :url => "/tasks/external_payment_requests/#{self.external_id}",
       :method => 'PUT'
     )
   end

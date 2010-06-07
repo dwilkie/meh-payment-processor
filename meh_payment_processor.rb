@@ -35,7 +35,7 @@ class MehPaymentProcessor < Sinatra::Base
     )
   end
   
-  put '/tasks/verify/payment_request/:id' do
+  put '/tasks/verify/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     external_payment_request = ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
@@ -48,7 +48,7 @@ class MehPaymentProcessor < Sinatra::Base
     end
   end
 
-  put '/tasks/process/payment_request/:id' do
+  put '/tasks/process/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     paypal_payment_request = PaypalPaymentRequest.new(
       app_settings['paypal']['api_credentials']
@@ -62,7 +62,7 @@ class MehPaymentProcessor < Sinatra::Base
     payment_request.complete(response)
   end
   
-  put '/tasks/external_payment_request/:id' do
+  put '/tasks/external_payment_requests/:id' do
     ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
     ).notify(params[:id], request.env["rack.input"].read)
@@ -80,7 +80,7 @@ class MehPaymentProcessor < Sinatra::Base
     )
   end
   
-  head '/payment_request/:id' do
+  head '/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     if payment_request && payment_request.completed?
       merged_params = params.merge(:external_id => payment_request.external_id)

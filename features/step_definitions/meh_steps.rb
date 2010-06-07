@@ -31,7 +31,7 @@ When /^the configured external application makes a payment request(?: with (.+))
 end
 
 When /^a payment notification verification request is received for (\d+)(?: with (.+))?$/ do |id, fields|
-  @response = head "/payment_request/#{id}", parse_fields(fields)
+  @response = head "/payment_requests/#{id}", parse_fields(fields)
 end
 
 Then(/^a (\w+) should (?:be created|exist)(?: with (.+))?$/) do |model_name, fields|
