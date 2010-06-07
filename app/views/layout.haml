@@ -1,6 +1,9 @@
 !!! Strict
 %html{:xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang=>"en"}
   %head
-    %link{:rel=>'stylesheet', :href=>'/stylesheets/formtastic.css', :type => "text/css"} 
+    %link{:rel=>'stylesheet', :href=>'/stylesheets/formtastic.css', :type => "text/css"}
+    %link{:rel=>'stylesheet', :href=>'/stylesheets/formtastic_changes.css', :type => "text/css"}
+    %link{:rel=>'stylesheet', :href=>'/stylesheets/application.css', :type => "text/css"}
   %body
-    = yield
+    #container
+      = yield

@@ -3,6 +3,7 @@ rerun.txt
 bin/**
 WEB-INF/**
 public/**
+!public/stylesheets
 .gems
 .bundle
 vendor

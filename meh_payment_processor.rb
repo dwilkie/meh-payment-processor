@@ -84,7 +84,7 @@ class MehPaymentProcessor < Sinatra::Base
       404
     end
   end
-  
+
   get '/admin/payees' do
     haml :'admin/payees/index'
   end
