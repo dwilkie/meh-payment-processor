@@ -7,7 +7,7 @@ class ExternalPaymentRequest
   def verified?(id, params)
     uri = URI.join(
       @external_application_uri,
-      "payment_request/#{id}"
+      "payment_requests/#{id}"
     )
     uri.query = params.to_params
     uri = uri.to_s
@@ -18,7 +18,7 @@ class ExternalPaymentRequest
   def notify(id, payment_response)
     uri = URI.join(
       @external_application_uri,
-      "payment_request/#{id}"
+      "payment_requests/#{id}"
     )
     @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,

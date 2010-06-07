@@ -2,7 +2,7 @@ module FakeWebHelper
   def register_external_payment_request(method, status)
     FakeWeb.register_uri(
       method,
-      %r|http://localhost:3000/payment_request/\d+(?:\?[^\s\?]+)?|,
+      %r|http://localhost:3000/payment_requests/\d+(?:\?[^\s\?]+)?|,
       :status => status
     )
   end
@@ -15,13 +15,13 @@ module FakeWebHelper
     
     FakeWeb.register_uri(
       :post,
-      "https://svcs.sandbox.paypal.com/AdaptivePayments/Pay",
+      paypal_payments_uri,
       :response => response
     )
   end
   
   def external_payment_request_uri(id, fields=nil)
-    uri = "http://localhost:3000/payment_request/#{id}"
+    uri = "http://localhost:3000/payment_requests/#{id}"
     uri << "?#{fields.to_params}" if fields
     uri
   end
