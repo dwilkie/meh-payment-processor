@@ -1,0 +1,10 @@
+%h1 Add Payee
+%form.#new_payeee(class = "formtastic payee", action="/admin/payees", method="POST")
+  %fieldset.inputs
+    %legend
+      %span Details
+    %ol
+      %li#payee_email(class="string required")
+        %label(for="payee_email")Email
+          %abbr(title="required")*
+        %input#payee_email(name="payee[email]", type="text")

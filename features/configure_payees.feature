@@ -7,3 +7,5 @@ Feature: Configure Payees
     Given I am logged in
     And I go to the payees page
     When I follow "Add New"
+    Then I should be on the new payee page
+

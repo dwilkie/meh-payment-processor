@@ -16,6 +16,9 @@ module NavigationHelpers
     when /the payees page/
       '/admin/payees'
 
+    when /the new payee page/
+      '/admin/payees/new'
+
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #

@@ -4,6 +4,7 @@ require 'dm-timestamps'
 require 'dm-validations'
 require 'dm-observer'
 require 'dm-types'
+require 'haml'
 require './lib/dm_extlib_hash'
 require './app/models/payment_request'
 require './app/models/payment_request_observer'
@@ -15,6 +16,8 @@ class MehPaymentProcessor < Sinatra::Base
   set app_settings = YAML.load(
     File.read("config/#{environment.to_s}.yml")
   )
+
+  set :views, File.dirname(__FILE__) + '/app/views'
 
   # All uri's starting with /task are private for the
   # task queue. NOTE: never use create! with DM because
@@ -83,6 +86,11 @@ class MehPaymentProcessor < Sinatra::Base
   end
   
   get '/admin/payees' do
-    "meh"
+    haml :'admin/payees/index'
   end
+  
+  get '/admin/payees/new' do
+    haml :'admin/payees/new'
+  end
+  
 end
