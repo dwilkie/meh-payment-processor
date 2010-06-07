@@ -1,1 +1,33 @@
-%a(href="/admin/payees/new") Add New
+%h2 My Payees
+%a{:href => "/admin/payees/new"} Add New
+%table
+  %tr
+    %th Name
+    %th Email
+    %th Maximum Amount
+    %th
+    %th
+  - for payee in @payees
+    %tr
+      %td
+        - name = h payee.name
+        - if name.blank?
+          = payee.email.split("@").first
+        - else
+          = name
+      %td
+        - email = h payee.email
+        %a{:href => "mailto:#{email}"}
+          = email
+      %td
+        - amount = payee.maximum_amount
+        - if amount.zero?
+          Unlimited
+        - else
+          = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
+      %td
+        %a{:href => "/admin/payee/#{payee.id}"}
+          Edit
+      %td
+        %a{:href => "/admin/payee/#{payee.id}", :method => :delete}
+          Delete

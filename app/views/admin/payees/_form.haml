@@ -1,0 +1,54 @@
+%form#new_payee{                  |
+    :class => "formtastic payee", |
+    :action => "/admin/payees",   |
+    :method =>"POST"              |
+  }                               |
+  %fieldset.inputs
+    %legend
+      %span Details
+    %ol
+      %li#payee_name_input(class="string optional")
+        %label{:for => "payee_name"}
+          Name
+        %input#payee_name{:name => "payee[name]", :type => "text"}
+        %p.inline-hints
+          The payees name (optional)
+      - input_class = "string required"
+      - if email_errors = @payee.errors[:email]
+        - input_class += " error"
+        - error_message = email_errors.join(", ")
+      %li#payee_email_input{:class => input_class}
+        - if email_errors
+          %p.inline-errors
+            = error_message
+        %label{:for => "payee_email"}
+          Email
+          %abbr{:title => "required"}*
+        %input#payee_email{:name => "payee[email]", :type => "text"}
+        %p.inline-hints
+          The payees Paypal email address
+      %li#payee_maximum_amount_input(class="string optional")
+        %label{:for => "payee_maximum_amount"}
+          Maximum Amount
+        %input#payee_maximum_amount{        |
+          :name => "payee[maximum_amount]", |
+          :type => "text"                   |
+        }                                   |
+        %p.inline-hints
+          The maximum amount you would like to pay this payee (optional)
+      %li#payee_currency_input(class="select optional")
+        %label{:for => "payee_currency"}
+          Currency
+        %select#payee_currency{:name => "payee[currency]"}
+          %option{:value => "AUD"}
+            AUD
+          %option{:value => "THB"}
+            THB
+  %fieldset.buttons
+    %ol
+      %li.commit
+        %input#payee_submit.create{ |
+          :name => "commit",        |
+          :type =>"submit",         |
+          :value => "Add Payee"     |
+        }                           |

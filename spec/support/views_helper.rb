@@ -1,13 +1,16 @@
 # Modified from original blog: 
 # http://japhr.blogspot.com/2009/03/rspec-with-sinatra-haml.html
+# http://japhr.blogspot.com/2009/03/sinatra-innards-deletgator.html
 
 require 'haml'
 require 'rspec_tag_matchers'
+require File.join(File.dirname(__FILE__), '..', '..', 'app', 'helpers', 'application_helper')
 
 VIEWS_PATH = File.join(File.dirname(__FILE__), '..', '..', 'app', 'views')
 
 Rspec.configure do |c|
   c.include(RspecTagMatchers)
+  c.include(ApplicationHelper)
 end
 
 # Renders the template with Haml::Engine and assigns the
@@ -18,7 +21,7 @@ def render
   )
   template = File.read("#{template}.haml")
   engine = Haml::Engine.new(template)
-  @response = engine.render(Object.new, assigns_for_template)
+  @response = engine.render(self, assigns_for_template)
 end
 
 # Convenience method to access the @response instance variable set in

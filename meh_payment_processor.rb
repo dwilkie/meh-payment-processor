@@ -10,6 +10,8 @@ require './app/models/payment_request'
 require './app/models/payment_request_observer'
 require './app/models/external_payment_request'
 require './app/models/paypal_payment_request'
+require './app/models/payee'
+require './app/helpers/application_helper'
 
 class MehPaymentProcessor < Sinatra::Base
 
@@ -18,6 +20,10 @@ class MehPaymentProcessor < Sinatra::Base
   )
 
   set :views, File.dirname(__FILE__) + '/app/views'
+
+  helpers do
+    include ApplicationHelper
+  end
 
   # All uri's starting with /task are private for the
   # task queue. NOTE: never use create! with DM because
@@ -85,12 +91,26 @@ class MehPaymentProcessor < Sinatra::Base
     end
   end
 
+  get '/' do
+    haml :home
+  end
+
   get '/admin/payees' do
+    @payees = Payee.all
     haml :'admin/payees/index'
   end
   
   get '/admin/payees/new' do
+    @payee = Payee.new
     haml :'admin/payees/new'
   end
   
+  post '/admin/payees' do
+    @payee = Payee.new(params["payee"])
+    if @payee.save
+      redirect '/admin/payees'
+    else
+      haml :'admin/payees/new'
+    end
+  end
 end
