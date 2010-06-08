@@ -20,5 +20,8 @@ class Payee
     self.currency = nil if self.currency.blank?
     Money.new(self.cents, self.currency)
   end
-
+  
+  def name
+    (@name.blank? && !email.blank?) ? email.split("@").first.capitalize : @name
+  end
 end

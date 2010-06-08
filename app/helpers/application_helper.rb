@@ -1,3 +1,4 @@
+require 'securerandom'
 module ApplicationHelper
   include ::Rack::Utils
   alias_method :h, :escape_html
@@ -17,4 +18,23 @@ module ApplicationHelper
       haml(:"#{template}", options)
     end
   end
+  
+  def form_authenticity_param
+    "authenticity_token"
+  end
+
+  def form_authenticity_token
+    session[:csrf_token] ||= SecureRandom.base64(32)
+  end
+  
+  def protect_from_forgery(params)
+    debugger
+    raise("Invalid Authenticity Token") unless form_authenticity_token == params.delete(form_authenticity_param)
+  end
+  
+  def add_forgery_protection(params=nil)
+    params ||= {}
+    params.merge({form_authenticity_param => form_authenticity_token})
+  end
+
 end

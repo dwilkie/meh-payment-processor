@@ -35,6 +35,12 @@ module AppEngine
     end
   end
   
+  class Users
+    def self.create_logout_url(url)
+      '/logout'
+    end
+  end
+  
   module Labs
     class TaskQueue
       def self.add(payload, options)

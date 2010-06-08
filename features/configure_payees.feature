@@ -6,10 +6,6 @@ Feature: Configure Payees
   Scenario: Navigate to new payee page from the homepage
     Given I am on the homepage
     And I am logged in
-
-    When I follow "Configure Payees"
-
-    Then I should be on the payees page
     
     When I follow "Add New"
     
@@ -31,7 +27,16 @@ Feature: Configure Payees
     And I should see "John"
     And I should see "someone@example.com"
     And I should see "500.00 THB"
+
+  Scenario: Cancel adding a payee
+    Given I am on the new payee page
+
+    When I fill in "Email" with "johnny@gmail.com"
+    And I follow "Cancel"
     
+    Then I should be on the payees page
+    And I should not see "johnny@gmail.com"
+
   Scenario: Try and create a payee with no email address
     Given I am on the new payee page
     
@@ -68,9 +73,7 @@ Feature: Configure Payees
   Scenario: Navigate to edit payee page from the homepage
     Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
     And I am on the homepage
-    
-    When I follow "Configure Payees"
-    And I follow "Edit" for that payee
+    When I follow "Edit" for that payee
     
     Then I should be on the edit payee page for that payee
     And I should see "Editing Payee: Johnny"
@@ -92,6 +95,17 @@ Feature: Configure Payees
     And I should see "john@example.com"
     And I should see "1,000.00 THB"
     
+  Scenario: Cancel updating a payee
+    Given a payee exists with email: "john@example.com"
+    And I am on the edit payee page for that payee
+    
+    When I fill in "Email" with "johnny2@gmail.com"
+    And I follow "Cancel"
+    
+    Then I should be on the payees page
+    And I should see "john@example.com"
+    And I should not see "johnny2@gmail.com"
+    
   Scenario: Try to update a payee with invalid values
     Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
     And I am on the edit payee page for that payee
@@ -102,3 +116,12 @@ Feature: Configure Payees
 
     Then I should see "Email must not be blank"
     And I should see "Currency must not be blank"
+
+  Scenario: Delete a payee
+    Given a payee exists with email: "john@example.com"
+    And I am on the payees page
+    
+    When I follow "Delete"
+    
+    Then I should be on the payees page
+    And I should not see "john@example.com"

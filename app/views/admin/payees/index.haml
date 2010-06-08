@@ -10,8 +10,7 @@
   - for payee in @payees
     %tr{:id => payee.id}
       %td
-        - name = h payee.name
-        = name.blank? ? h(payee.email.split("@").first.capitalize) : name
+        = h payee.name
       %td
         - email = h payee.email
         %a{:href => "mailto:#{email}"}
@@ -26,5 +25,10 @@
         %a{:href => "/admin/payees/#{payee.id}/edit"}
           Edit
       %td
-        %a{:href => "/admin/payees/#{payee.id}", :method => :delete}
+        %a{                                       |
+            :href => "/admin/payees/#{payee.id}", |
+            :'data-confirm' => "Are you sure?",   |
+            :'data-method' =>"delete",            |
+            :rel => "nofollow"                    |
+          }                                       |
           Delete

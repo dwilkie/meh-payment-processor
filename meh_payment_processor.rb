@@ -21,10 +21,21 @@ class MehPaymentProcessor < Sinatra::Base
 
   set :views, File.dirname(__FILE__) + '/app/views'
   set :method_override, true   # enables put and delete requests for forms
+  enable :sessions
 
   helpers do
     include ApplicationHelper
   end
+  
+  before do
+    request_method = request.env["REQUEST_METHOD"]
+    if request_method == "POST" || request_method == "PUT" || request_method == "DELETE"
+      protect_from_forgery(params) unless
+        settings.skip_forgery_protection.include?(request.env["PATH_INFO"])
+    end
+  end
+  
+  set :skip_forgery_protection, %w[ /payment_requests ]
 
   # All uri's starting with /task are private for the
   # task queue. NOTE: never use create! with DM because
@@ -76,7 +87,7 @@ class MehPaymentProcessor < Sinatra::Base
     # Schedule the creation of a payment request to the queue
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :params => params,
+      :params => add_forgery_protection(params),
       :url => '/tasks/payment_requests'
     )
   end
@@ -93,7 +104,7 @@ class MehPaymentProcessor < Sinatra::Base
   end
 
   get '/' do
-    haml :home
+    redirect :'admin/payees'
   end
 
   # Payee Resource
@@ -112,8 +123,11 @@ class MehPaymentProcessor < Sinatra::Base
 
   # edit
   get '/admin/payees/:id/edit' do
-    @payee = Payee.get(params["id"])
-    haml :'admin/payees/edit'
+    if @payee = Payee.get(params["id"])
+      haml :'admin/payees/edit'
+    else
+      redirect '/admin/payees'
+    end
   end
 
   # create
@@ -134,5 +148,11 @@ class MehPaymentProcessor < Sinatra::Base
     else
       haml :'admin/payees/edit'
     end
+  end
+  
+  # destroy
+  delete '/admin/payees/:id' do
+    Payee.get(params["id"]).destroy!
+    redirect '/admin/payees'
   end
 end

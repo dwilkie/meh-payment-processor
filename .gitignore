@@ -4,6 +4,7 @@ bin/**
 WEB-INF/**
 public/**
 !public/stylesheets
+!public/javascripts
 .gems
 .bundle
 vendor

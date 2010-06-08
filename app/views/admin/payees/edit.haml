@@ -1,5 +1,4 @@
-- name = h @payee.name
-- name = name.blank? ? h(@payee.email.split("@").first.capitalize) : name
 %h1
-  = "Editing Payee: #{name}"
+  = "Editing Payee: #{@payee.name}"
 = partial :'admin/payees/form', :locals =>{:action => "/admin/payees/#{@payee.id}", :method => "put"}
+

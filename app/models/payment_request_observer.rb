@@ -7,6 +7,7 @@ class PaymentRequestObserver
   after :create do
     AppEngine::Labs::TaskQueue.add(
       nil,
+      :params => add_forgery_protection,
       :url => "/tasks/verify/payment_requests/#{self.id}",
       :method => 'PUT'
     )
@@ -17,6 +18,7 @@ class PaymentRequestObserver
   after :verify do
     AppEngine::Labs::TaskQueue.add(
       nil,
+      :params => add_forgery_protection,
       :url => "/tasks/process/payment_requests/#{self.id}",
       :method => 'PUT'
     )
@@ -27,6 +29,7 @@ class PaymentRequestObserver
   after :complete do
     AppEngine::Labs::TaskQueue.add(
       self.payment_response,
+      :params => add_forgery_protection,
       :url => "/tasks/external_payment_requests/#{self.external_id}",
       :method => 'PUT'
     )

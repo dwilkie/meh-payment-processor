@@ -3,10 +3,12 @@ require 'dm-core'
 require 'meh_payment_processor'
 require 'appengine-apis/labs/taskqueue'
 require 'appengine-apis/urlfetch'
+require 'appengine-apis/users'
 
 AppEngine::Rack.configure_app(
   :application => 'meh-payment-processor',
-  :version => '0-0-1')
+  :version => '0-0-1'
+)
 
 # Configure DataMapper to use the App Engine datastore
 DataMapper.setup(:default, "appengine://auto")
