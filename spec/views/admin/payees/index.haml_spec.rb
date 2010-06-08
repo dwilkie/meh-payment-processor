@@ -11,7 +11,8 @@ describe "/admin/payees/index" do
         :maximum_amount => mock(
           "Money",
           :format => "500",
-          :currency => mock("Currency", :iso_code => "THB")
+          :currency => mock("Currency", :iso_code => "THB"),
+          :zero? => false
         )
       )
     ]

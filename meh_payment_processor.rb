@@ -20,6 +20,7 @@ class MehPaymentProcessor < Sinatra::Base
   )
 
   set :views, File.dirname(__FILE__) + '/app/views'
+  set :method_override, true   # enables put and delete requests for forms
 
   helpers do
     include ApplicationHelper
@@ -95,22 +96,43 @@ class MehPaymentProcessor < Sinatra::Base
     haml :home
   end
 
+  # Payee Resource
+
+  # index
   get '/admin/payees' do
     @payees = Payee.all
     haml :'admin/payees/index'
   end
-  
+
+  # new
   get '/admin/payees/new' do
     @payee = Payee.new
     haml :'admin/payees/new'
   end
-  
+
+  # edit
+  get '/admin/payees/:id/edit' do
+    @payee = Payee.get(params["id"])
+    haml :'admin/payees/edit'
+  end
+
+  # create
   post '/admin/payees' do
     @payee = Payee.new(params["payee"])
     if @payee.save
       redirect '/admin/payees'
     else
       haml :'admin/payees/new'
+    end
+  end
+  
+  # update
+  put '/admin/payees/:id' do
+    @payee = Payee.get(params["id"])
+    if @payee.update(params["payee"])
+      redirect '/admin/payees'
+    else
+      haml :'admin/payees/edit'
     end
   end
 end

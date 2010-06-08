@@ -1,6 +1,6 @@
 %h2 My Payees
 %a{:href => "/admin/payees/new"} Add New
-%table
+%table#payees
   %tr
     %th Name
     %th Email
@@ -8,13 +8,10 @@
     %th
     %th
   - for payee in @payees
-    %tr
+    %tr{:id => payee.id}
       %td
         - name = h payee.name
-        - if name.blank?
-          = payee.email.split("@").first
-        - else
-          = name
+        = name.blank? ? h(payee.email.split("@").first.capitalize) : name
       %td
         - email = h payee.email
         %a{:href => "mailto:#{email}"}
@@ -26,8 +23,8 @@
         - else
           = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
       %td
-        %a{:href => "/admin/payee/#{payee.id}"}
+        %a{:href => "/admin/payees/#{payee.id}/edit"}
           Edit
       %td
-        %a{:href => "/admin/payee/#{payee.id}", :method => :delete}
+        %a{:href => "/admin/payees/#{payee.id}", :method => :delete}
           Delete

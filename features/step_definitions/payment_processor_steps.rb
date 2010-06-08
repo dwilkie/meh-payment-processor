@@ -13,6 +13,10 @@ Given /^a (completed )?payment request exists(?: with (.+))?$/ do |completed, fi
   PaymentRequest.get(id).update(:completed_at => nil) unless completed
 end
 
+Given /a payee exists(?: with (.+))?$/ do |fields|
+  Payee.create(parse_fields(fields))
+end
+
 When /^a payment request is received(?: with (.+))?$/ do |fields|
   register_external_payment_request(:head, ["404", "Not Found"])
   post "/payment_requests", parse_fields(fields)

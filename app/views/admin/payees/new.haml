@@ -1,2 +1,2 @@
 %h1 Add Payee
-= partial :'admin/payees/form'
+= partial :'admin/payees/form', :locals => {:method => "post", :action => '/admin/payees'}

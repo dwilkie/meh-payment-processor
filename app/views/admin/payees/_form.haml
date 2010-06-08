@@ -1,8 +1,9 @@
 %form#new_payee{                  |
     :class => "formtastic payee", |
-    :action => "/admin/payees",   |
-    :method =>"POST"              |
+    :action => action,            |
+    :method => "post"             |
   }                               |
+  %input{:name => "_method", :type => "hidden", :value => method}
   %fieldset.inputs
     %legend
       %span Details
@@ -10,45 +11,76 @@
       %li#payee_name_input(class="string optional")
         %label{:for => "payee_name"}
           Name
-        %input#payee_name{:name => "payee[name]", :type => "text"}
+        %input#payee_name{        |
+          :name => "payee[name]", |
+          :type => "text",        |
+          :value => @payee.name   |
+        }                         |
         %p.inline-hints
           The payees name (optional)
       - input_class = "string required"
-      - if email_errors = @payee.errors[:email]
+      - email_errors = @payee.errors[:email]
+      - unless email_errors.empty?
         - input_class += " error"
         - error_message = email_errors.join(", ")
       %li#payee_email_input{:class => input_class}
-        - if email_errors
+        - unless email_errors.empty?
           %p.inline-errors
             = error_message
         %label{:for => "payee_email"}
           Email
           %abbr{:title => "required"}*
-        %input#payee_email{:name => "payee[email]", :type => "text"}
+        %input#payee_email{        |
+          :name => "payee[email]", |
+          :type => "text",         |
+          :value => @payee.email   |
+        }                          |
         %p.inline-hints
           The payees Paypal email address
       %li#payee_maximum_amount_input(class="string optional")
         %label{:for => "payee_maximum_amount"}
-          Maximum Amount
+          Maximum amount
+          - amount = @payee.maximum_amount
+          - amount = amount.zero? ? nil : amount
         %input#payee_maximum_amount{        |
           :name => "payee[maximum_amount]", |
-          :type => "text"                   |
+          :type => "text",                  |
+          :value => amount                  |
         }                                   |
         %p.inline-hints
           The maximum amount you would like to pay this payee (optional)
-      %li#payee_currency_input(class="select optional")
+      - select_class = "select optional"
+      - currency_errors = @payee.errors[:currency]
+      - unless currency_errors.empty?
+        - select_class += "select required error"
+        - error_message = currency_errors.join(", ")
+      %li#payee_currency_input{:class => select_class}
+        - unless currency_errors.empty?
+          %p.inline-errors
+            = error_message
         %label{:for => "payee_currency"}
           Currency
-        %select#payee_currency{:name => "payee[currency]"}
-          %option{:value => "AUD"}
-            AUD
-          %option{:value => "THB"}
-            THB
+        %select#payee_currency{       |
+          :name => "payee[currency]"  |
+        }                             |
+          %option{:value => ''}
+          - Payee::CURRENCIES.each do |currency|
+            - selected = nil
+            - selected = "selected" if @payee.currency == currency
+            %option{:value => currency, :selected => selected }
+              = currency
   %fieldset.buttons
     %ol
       %li.commit
-        %input#payee_submit.create{ |
+        - if @payee.new?
+          - button_class = "create"
+          - button_text = "Add"
+        - else
+          - button_class = "update"
+          - button_text = "Update"
+        %input#payee_submit{        |
+          :class => button_class,   |
           :name => "commit",        |
           :type =>"submit",         |
-          :value => "Add Payee"     |
+          :value => button_text     |
         }                           |

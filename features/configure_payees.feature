@@ -8,10 +8,14 @@ Feature: Configure Payees
     And I am logged in
 
     When I follow "Configure Payees"
+
     Then I should be on the payees page
     
     When I follow "Add New"
+    
     Then I should be on the new payee page
+    And I should see "Add Payee"
+    And the "payee_submit" field should contain "Add"
     
   Scenario: Create a new payee supplying correct data
     Given I am on the new payee page
@@ -19,7 +23,7 @@ Feature: Configure Payees
     When I fill in the following:
     | Email          | someone@example.com |
     | Name           | John                |
-    | Maximum Amount | 500                 |
+    | Maximum amount | 500                 |
     And I select "THB" from "Currency"
     And I press "Add"
     
@@ -31,7 +35,7 @@ Feature: Configure Payees
   Scenario: Try and create a payee with no email address
     Given I am on the new payee page
     
-    When I press "Add Payee"
+    When I press "Add"
 
     Then I should see "Email must not be blank"
 
@@ -39,17 +43,62 @@ Feature: Configure Payees
     Given I am on the new payee page
     
     When I fill in "Email" with "meh"
-    And I press "Add Payee"
+    And I press "Add"
     
     Then I should see "Email has an invalid format"
+
+  Scenario: Try and create a duplicate payee
+    Given I am on the new payee page
+    And a payee exists with email: "john@example.com"
+    
+    When I fill in "Email" with "john@example.com"
+    And I press "Add"
+    
+    Then I should see "Email is already taken"
+    
+  Scenario: Forget to select a currency when specifying a maximum amount
+    Given I am on the new payee page
+    
+    When I fill in "Email" with "john@example.com"
+    And I fill in "Maximum amount" with "500"
+    And I press "Add"
+    
+    Then I should see "Currency must not be blank"
     
   Scenario: Navigate to edit payee page from the homepage
-    Given a payee exists with email: "john@example.com"
+    Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
     And I am on the homepage
     
     When I follow "Configure Payees"
-    And I follow "edit" within "#li"
+    And I follow "Edit" for that payee
     
+    Then I should be on the edit payee page for that payee
+    And I should see "Editing Payee: Johnny"
+    And the "payee_name" field should contain "Johnny"
+    And the "payee_email" field should contain "john@example.com"
+    And the "payee_maximum_amount" field should contain "500.00"
+    And the "payee_currency" field should contain "THB"
+    And the "payee_submit" field should contain "Update"
+
+  Scenario: Update a payee
+    Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
+    And I am on the edit payee page for that payee
     
+    When I fill in "Maximum amount" with "1000"
+
+    And I press "Update"
+    Then I should be on the payees page
+    And I should see "Johnny"
+    And I should see "john@example.com"
+    And I should see "1,000.00 THB"
     
-   
+  Scenario: Try to update a payee with invalid values
+    Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
+    And I am on the edit payee page for that payee
+    
+    When I fill in "Email" with ""
+    And I select "" from "Currency"
+    And I press "Update"
+
+    Then I should see "Email must not be blank"
+    And I should see "Currency must not be blank"
