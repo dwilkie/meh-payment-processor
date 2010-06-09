@@ -1,8 +1,10 @@
-%form#new_payee{                  |
-    :class => "formtastic payee", |
-    :action => action,            |
-    :method => "post"             |
-  }                               |
+- form_id = @payee.new? ? "new_payee" : "edit_payee_#{@payee.id}"
+%form{                               |
+       :id => form_id,               |
+       :class => "formtastic payee", |
+       :action => action,            |
+       :method => "post"             |
+  }                                  |
   %input{:name => "_method", :type => "hidden", :value => method}
   %input{                                 |
     :name => "authenticity_token",        |
@@ -10,8 +12,6 @@
     :value => h(form_authenticity_token)  |
   }                                       |
   %fieldset.inputs
-    %legend
-      %span Details
     %ol
       %li#payee_name_input(class="string optional")
         %label{:for => "payee_name"}

@@ -1,4 +1,7 @@
+- title = "Editing Payee: #{@payee.name}"
+%title
+  = title
 %h1
-  = "Editing Payee: #{@payee.name}"
+  = title
 = partial :'admin/payees/form', :locals =>{:action => "/admin/payees/#{@payee.id}", :method => "put"}
 

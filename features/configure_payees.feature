@@ -70,12 +70,12 @@ Feature: Configure Payees
     
     Then I should see "Currency must not be blank"
     
-  Scenario: Navigate to edit payee page from the homepage
+  Scenario: Navigate to edit page from the homepage
     Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
     And I am on the homepage
     When I follow "Edit" for that payee
     
-    Then I should be on the edit payee page for that payee
+    Then I should be on the edit page for that payee
     And I should see "Editing Payee: Johnny"
     And the "payee_name" field should contain "Johnny"
     And the "payee_email" field should contain "john@example.com"
@@ -85,7 +85,7 @@ Feature: Configure Payees
 
   Scenario: Update a payee
     Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
-    And I am on the edit payee page for that payee
+    And I am on the edit page for that payee
     
     When I fill in "Maximum amount" with "1000"
 
@@ -97,7 +97,7 @@ Feature: Configure Payees
     
   Scenario: Cancel updating a payee
     Given a payee exists with email: "john@example.com"
-    And I am on the edit payee page for that payee
+    And I am on the edit page for that payee
     
     When I fill in "Email" with "johnny2@gmail.com"
     And I follow "Cancel"
@@ -108,7 +108,7 @@ Feature: Configure Payees
     
   Scenario: Try to update a payee with invalid values
     Given a payee exists with email: "john@example.com", name: "Johnny", maximum_amount: "500", currency: "THB"
-    And I am on the edit payee page for that payee
+    And I am on the edit page for that payee
     
     When I fill in "Email" with ""
     And I select "" from "Currency"
@@ -117,8 +117,7 @@ Feature: Configure Payees
     Then I should see "Email must not be blank"
     And I should see "Currency must not be blank"
 
-  @current
-  Scenario: Delete a payee
+  Scenario: Delete a payee from the link with javascript enabled
     Given a payee exists with email: "john@example.com"
     And I am on the payees page
     
@@ -126,3 +125,31 @@ Feature: Configure Payees
     
     Then I should be on the payees page
     And I should not see "john@example.com"
+
+  Scenario: Delete a payee from the link with javascript disabled or manually navigate to the show page
+    Given a payee exists with email: "john@example.com"
+    And I am on the payees page
+    
+    When I go to the show page for that payeee
+    
+    Then I should see "Showing Payee: John"
+    And I should see "john@example.com"
+    And the "payee_submit" field should contain "Delete"
+
+  Scenario: Delete a payee from the the show page
+    Given a payee exists with email: "john@example.com"
+    And I am on the show page for that payees
+
+    When I press "Delete"
+    
+    Then I should be on the payees page
+    And I should not see "john@example.com"
+
+  Scenario: Cancel deleting a payee from the the show page
+    Given a payee exists with email: "john@example.com"
+    And I am on the show page for that payees
+
+    When I follow "Cancel"
+    
+    Then I should be on the payees page
+    And I should see "john@example.com"

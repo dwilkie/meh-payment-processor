@@ -1,0 +1,40 @@
+- title = "Showing Payee: #{@payee.name}"
+%title
+  = title
+%h1
+  = title
+%p
+  %strong Paypal email:
+  - email = h @payee.email
+  %a{:href => "mailto:#{email}"}
+    = email
+%p
+  %strong Maximum amount:
+  - amount = @payee.maximum_amount
+  - if amount.zero?
+    Unlimited
+  - else
+    = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
+%form{                                          |
+       :id => "delete_payee_#{@payee.id}",      |
+       :class => "formtastic payee",            |
+       :action => "/admin/payees/#{@payee.id}", |
+       :method => "post"                        |
+  }                                             |
+  %input{:name => "_method", :type => "hidden", :value => "delete"}
+  %input{                                 |
+    :name => "authenticity_token",        |
+    :type => "hidden",                    |
+    :value => h(form_authenticity_token)  |
+  }                                       |
+  %fieldset.buttons
+    %ol
+      %li.commit
+        %input#payee_submit{  |
+          :class => "delete", |
+          :name => "commit",  |
+          :type =>"submit",   |
+          :value => "Delete"  |
+        }                     |
+        or
+        %a{:href => "/admin/payees"} Cancel

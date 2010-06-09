@@ -1,2 +1,6 @@
-%h1 Add Payee
+- title = "Add Payee"
+%title
+  = title
+%h1
+  = title
 = partial :'admin/payees/form', :locals => {:method => "post", :action => '/admin/payees'}

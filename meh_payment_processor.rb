@@ -158,6 +158,10 @@ class MehPaymentProcessor < Sinatra::Base
   
   # show (delete with javascript disabled)
   get '/admin/payees/:id' do
-    redirect '/admin/payees'
+    if @payee = Payee.get(params["id"])
+      haml :'admin/payees/show'
+    else
+      redirect '/admin/payees'
+    end
   end
 end

@@ -19,8 +19,10 @@ module NavigationHelpers
     when /the new payee page/
       '/admin/payees/new'
 
-    when /the edit payee page for that payee/
-      "/admin/payees/#{Payee.last.id}/edit"
+    when /the (edit |show )page for that payee/
+      path = "/admin/payees/#{Payee.last.id}"
+      path << "/edit" if $1 =~ /^edit/
+      path
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

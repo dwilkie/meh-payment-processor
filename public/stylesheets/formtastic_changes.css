@@ -8,13 +8,6 @@ For example, to make the inline hint paragraphs a little darker in color than th
 form.formtastic fieldset ol li p.inline-hints { color:#333; }
 
 --------------------------------------------------------------------------------------------------*/
-form.formtastic fieldset ol li p.active {
-  color:green;
-}
-
-form.formtastic fieldset ol li p.unverified {
-  color:red;
-}
 
 form.formtastic fieldset ol li p.inline-hints {
   clear: both;
@@ -22,28 +15,7 @@ form.formtastic fieldset ol li p.inline-hints {
   font-size:11px;
   }
 
-form.formtastic fieldset p.inline-errors, form.formtastic fieldset ol p.inline-errors {
+form.formtastic fieldset ol p.inline-errors {
   color:#cc0000;
   margin:0.5em 0 0 25%;
   }
-
-/* LABEL TEXT OVERRIDES
---------------------------------------------------------------------------------------------------*/
-form.formtastic fieldset ol li fieldset legend, form.formtastic fieldset ol li label { font-weight:bold; color: #666666; }
-
-form.formtastic fieldset.inputs legend, form.formtastic fieldset.input_subcollection legend { font-size:150%; }
-form.formtastic fieldset ol li fieldset legend span { font-size:66%; }
-
-/* FORM INPUT SIZES
---------------------------------------------------------------------------------------------------*/
-form.formtastic fieldset ol li input.small { width:10%; }
-form.formtastic fieldset ol li input.tiny { width:6%; }
-form.formtastic fieldset ol li input.medium { width:25%; }
-
-/* NEW PRODUCT FORM
---------------------------------------------------------------------------------------------------*/
-form.formtastic fieldset img {margin-bottom: 10px;}
-
-form.formtastic fieldset div.fields a#remove{ margin:0.5em 0 0 25%; }
-form.formtastic fieldset div.fields{ margin-top:10px; }
-
