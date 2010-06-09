@@ -31,11 +31,11 @@ class MehPaymentProcessor < Sinatra::Base
     request_method = request.env["REQUEST_METHOD"]
     if request_method == "POST" || request_method == "PUT" || request_method == "DELETE"
       protect_from_forgery(params) unless
-        settings.skip_forgery_protection.include?(request.env["PATH_INFO"])
+        skip_forgery_protection?(request.env["PATH_INFO"])
     end
   end
   
-  set :skip_forgery_protection, %w[ /payment_requests ]
+  set :skip_forgery_protection, [ "/payment_requests", /^\/tasks\/.+$/ ]
 
   # All uri's starting with /task are private for the
   # task queue. NOTE: never use create! with DM because
@@ -87,7 +87,7 @@ class MehPaymentProcessor < Sinatra::Base
     # Schedule the creation of a payment request to the queue
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :params => add_forgery_protection(params),
+      :params => params,
       :url => '/tasks/payment_requests'
     )
   end

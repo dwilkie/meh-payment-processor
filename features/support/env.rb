@@ -15,7 +15,7 @@ require 'database_cleaner'
 require 'database_cleaner/cucumber'
 
 Capybara.app = MehPaymentProcessor
-
+FakeWeb.allow_net_connect = false
 DatabaseCleaner.strategy = :transaction
 DataMapper.setup(:default, 'sqlite3::memory:')
 DataMapper.auto_migrate!

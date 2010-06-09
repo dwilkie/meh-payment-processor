@@ -28,13 +28,19 @@ module ApplicationHelper
   end
   
   def protect_from_forgery(params)
-    debugger
     raise("Invalid Authenticity Token") unless form_authenticity_token == params.delete(form_authenticity_param)
   end
-  
-  def add_forgery_protection(params=nil)
-    params ||= {}
-    params.merge({form_authenticity_param => form_authenticity_token})
+    
+  def skip_forgery_protection?(request)
+    skip = false
+    settings.skip_forgery_protection.each do |path|
+      if path.is_a?(String)
+        skip = path == request
+      elsif path.is_a?(Regexp)
+        skip = path =~ request
+      end
+      break if skip
+    end
+    skip
   end
-
 end

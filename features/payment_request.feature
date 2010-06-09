@@ -23,3 +23,10 @@ Feature: Payment Request
     Then a payment_request should be created with external_id: 347752
     But a HEAD request should have been made to the external application for the payment request: 347752 returning status "404 Not Found" with amount: "5000.00", currency: "THB", to: "someone@gmail.com"
     And the payment request should not be verified
+    
+  Scenario: A CSRF attack triggers the process payment request task
+    Given I am logged in
+    
+    When I am CSRF attacked to trigger the process payment request task
+    
+    

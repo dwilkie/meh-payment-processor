@@ -117,6 +117,7 @@ Feature: Configure Payees
     Then I should see "Email must not be blank"
     And I should see "Currency must not be blank"
 
+  @current
   Scenario: Delete a payee
     Given a payee exists with email: "john@example.com"
     And I am on the payees page
