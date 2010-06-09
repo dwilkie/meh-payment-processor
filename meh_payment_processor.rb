@@ -155,4 +155,9 @@ class MehPaymentProcessor < Sinatra::Base
     Payee.get(params["id"]).destroy!
     redirect '/admin/payees'
   end
+  
+  # show (delete with javascript disabled)
+  get '/admin/payees/:id' do
+    redirect '/admin/payees'
+  end
 end

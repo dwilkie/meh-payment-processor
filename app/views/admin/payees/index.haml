@@ -1,34 +1,40 @@
-%h2 My Payees
-%a{:href => "/admin/payees/new"} Add New
-%table#payees
-  %tr
-    %th Name
-    %th Email
-    %th Maximum Amount
-    %th
-    %th
-  - for payee in @payees
-    %tr{:id => payee.id}
-      %td
-        = h payee.name
-      %td
-        - email = h payee.email
-        %a{:href => "mailto:#{email}"}
-          = email
-      %td
-        - amount = payee.maximum_amount
-        - if amount.zero?
-          Unlimited
-        - else
-          = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
-      %td
-        %a{:href => "/admin/payees/#{payee.id}/edit"}
-          Edit
-      %td
-        %a{                                       |
-            :href => "/admin/payees/#{payee.id}", |
-            :'data-confirm' => "Are you sure?",   |
-            :'data-method' =>"delete",            |
-            :rel => "nofollow"                    |
-          }                                       |
-          Delete
+%h1 My Payees
+- if @payees.empty?
+  %p
+    %strong You have no configured payees.
+%p
+  We will never send money to a payee that is not listed here.
+  %a{:href => "/admin/payees/new"} Add new
+- unless @payees.empty?
+  %table#payees
+    %tr
+      %th Name
+      %th Email
+      %th Maximum Amount
+      %th
+      %th
+    - for payee in @payees
+      %tr{:id => payee.id}
+        %td
+          = h payee.name
+        %td
+          - email = h payee.email
+          %a{:href => "mailto:#{email}"}
+            = email
+        %td
+          - amount = payee.maximum_amount
+          - if amount.zero?
+            Unlimited
+          - else
+            = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
+        %td
+          %a{:href => "/admin/payees/#{payee.id}/edit"}
+            Edit
+        %td
+          %a{                                       |
+              :href => "/admin/payees/#{payee.id}", |
+              :'data-confirm' => "Are you sure?",   |
+              :'data-method' =>"delete",            |
+              :rel => "nofollow"                    |
+            }                                       |
+            Delete

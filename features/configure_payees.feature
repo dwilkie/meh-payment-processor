@@ -7,7 +7,7 @@ Feature: Configure Payees
     Given I am on the homepage
     And I am logged in
     
-    When I follow "Add New"
+    When I follow "Add new"
     
     Then I should be on the new payee page
     And I should see "Add Payee"

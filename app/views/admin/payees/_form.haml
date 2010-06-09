@@ -21,8 +21,6 @@
           :type => "text",        |
           :value => @payee.name   |
         }                         |
-        %p.inline-hints
-          The payees name
       - input_class = "string required"
       - email_errors = @payee.errors[:email]
       - unless email_errors.empty?
@@ -53,7 +51,7 @@
           :value => amount                  |
         }                                   |
         %p.inline-hints
-          The maximum amount you would like to pay this payee (optional)
+          The maximum amount you would like to pay this payee
       - select_class = "select optional"
       - currency_errors = @payee.errors[:currency]
       - unless currency_errors.empty?
