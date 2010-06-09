@@ -14,8 +14,10 @@ gem "dm-timestamps"
 gem "dm-validations"
 gem "dm-observer"
 gem "dm-types"
+gem "dm-aggregates"
 gem "jruby-openssl"
 gem "sinatra"
-gem "haml", "<3" # Work around until next version of haml is released http://groups.google.com/group/appengine-jruby/browse_thread/thread/74ac120f06827d23/6fca48e30f548749#6fca48e30f548749
+gem "haml"
 gem "sinatra-r18n"
 gem "money"
+

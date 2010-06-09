@@ -10,10 +10,10 @@
     = email
 %p
   %strong Maximum amount:
-  - amount = @payee.maximum_amount
-  - if amount.zero?
+  - if @payee.pay_unlimited?
     Unlimited
   - else
+    - amount = @payee.maximum_amount
     = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
 %form{                                          |
        :id => "delete_payee_#{@payee.id}",      |
@@ -38,3 +38,4 @@
         }                     |
         or
         %a{:href => "/admin/payees"} Cancel
+

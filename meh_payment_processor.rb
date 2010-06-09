@@ -26,7 +26,7 @@ class MehPaymentProcessor < Sinatra::Base
   helpers do
     include ApplicationHelper
   end
-  
+
   before do
     request_method = request.env["REQUEST_METHOD"]
     if request_method == "POST" || request_method == "PUT" || request_method == "DELETE"
@@ -34,19 +34,16 @@ class MehPaymentProcessor < Sinatra::Base
         skip_forgery_protection?(request.env["PATH_INFO"])
     end
   end
-  
+
   set :skip_forgery_protection, [ "/payment_requests", /^\/tasks\/.+$/ ]
 
   # All uri's starting with /task are private for the
   # task queue. NOTE: never use create! with DM because
   # it will bypass hooks and the observer will not be run
   post '/tasks/payment_requests' do
-    PaymentRequest.create(
-      :external_id => params.delete("external_id"),
-      :params => params
-    )
+    PaymentRequest.create(params)
   end
-  
+
   put '/tasks/verify/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     external_payment_request = ExternalPaymentRequest.new(
@@ -62,22 +59,25 @@ class MehPaymentProcessor < Sinatra::Base
 
   put '/tasks/process/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
-    paypal_payment_request = PaypalPaymentRequest.new(
-      app_settings['paypal']['api_credentials']
-    )
-    response = paypal_payment_request.pay(
-      app_settings['paypal']['uri'],
-      app_settings['my_application']['uri'],
-      app_settings['my_application']['uri'],
-      payment_request.params
-    )
-    payment_request.complete(response)
+    if payment_request.verified? && !payment_request.sent_for_processing?
+      payment_request.send_for_processing
+      paypal_payment_request = PaypalPaymentRequest.new(
+        app_settings['paypal']['api_credentials']
+      )
+      response = paypal_payment_request.pay(
+        app_settings['paypal']['uri'],
+        app_settings['my_application']['uri'],
+        app_settings['my_application']['uri'],
+        payment_request.payment_params
+      )
+      payment_request.complete(response)
+    end
   end
-  
+
   put '/tasks/external_payment_requests/:id' do
     ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
-    ).notify(params[:id], request.env["rack.input"].read)
+    ).notify(params["id"], request.env["rack.input"].read)
   end
 
   # External request is executed here
@@ -86,12 +86,11 @@ class MehPaymentProcessor < Sinatra::Base
   post '/payment_requests' do
     # Schedule the creation of a payment request to the queue
     AppEngine::Labs::TaskQueue.add(
-      nil,
-      :params => params,
+      request.env["rack.input"].read,
       :url => '/tasks/payment_requests'
     )
   end
-  
+
   head '/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     if payment_request && payment_request.completed?
@@ -139,7 +138,7 @@ class MehPaymentProcessor < Sinatra::Base
       haml :'admin/payees/new'
     end
   end
-  
+
   # update
   put '/admin/payees/:id' do
     @payee = Payee.get(params["id"])
@@ -149,13 +148,13 @@ class MehPaymentProcessor < Sinatra::Base
       haml :'admin/payees/edit'
     end
   end
-  
+
   # destroy
   delete '/admin/payees/:id' do
     Payee.get(params["id"]).destroy!
     redirect '/admin/payees'
   end
-  
+
   # show (delete with javascript disabled)
   get '/admin/payees/:id' do
     if @payee = Payee.get(params["id"])
@@ -165,3 +164,4 @@ class MehPaymentProcessor < Sinatra::Base
     end
   end
 end
+

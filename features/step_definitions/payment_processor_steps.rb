@@ -1,4 +1,4 @@
-Given /^a (completed )?payment request exists(?: with (.+))?$/ do |completed, fields|
+Given /^a (verified |processing |completed )?payment request exists(?: with (.+))?$/ do |status, fields|
   register_external_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
   register_external_payment_request(:put, ["200", "OK"])
@@ -10,11 +10,29 @@ Given /^a (completed )?payment request exists(?: with (.+))?$/ do |completed, fi
     :external_id => external_id,
     :params => fields
   )
-  PaymentRequest.get(id).update(:completed_at => nil) unless completed
+  unless status =~ /^completed/
+    payment_request = PaymentRequest.get(id)
+    unless status =~ /^processing/
+      unless status =~ /^verified/
+        payment_request.verified_at = nil
+      end
+      payment_request.sent_for_processing_at = nil
+    end
+    payment_request.completed_at = nil
+    payment_request.save
+  end
 end
 
-Given /a payee exists(?: with (.+))?$/ do |fields|
+Given /^a payee exists(?: with (.+))?$/ do |fields|
   Payee.create(parse_fields(fields))
+end
+
+Given /^the response (?:is|was) "200 OK"$/ do
+   # this step is intentionally empty!
+end
+
+Given /^I have not configured any payees$/ do
+  # this step is intentionally empty!
 end
 
 When /^a payment request is received(?: with (.+))?$/ do |fields|
@@ -27,15 +45,20 @@ When /^another payment request is received(?: with (.+))?$/ do |fields|
   post "/payment_requests", parse_fields(fields)
 end
 
-When /^the configured external application makes a payment request(?: with (.+))?$/ do |fields|
+When /^the configured external application makes a payment request with: "([^\"]*)"$/ do |fields|
   register_external_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
   register_external_payment_request(:put, ["200", "OK"])
-  post "/payment_requests", parse_fields(fields)
+  post "/payment_requests", instance_eval(fields)
 end
 
 When /^a payment notification verification request is received for (\d+)(?: with (.+))?$/ do |id, fields|
   @response = head "/payment_requests/#{id}", parse_fields(fields)
+end
+
+When /^I am CSRF attacked to trigger the process payment request task for the payment request: (\d+)$/ do |id|
+  AppEngine::URLFetch.clean_registry
+  put "/tasks/process/payment_requests/#{id}"
 end
 
 Then(/^a (\w+) should (?:be created|exist)(?: with (.+))?$/) do |model_name, fields|
@@ -49,21 +72,29 @@ Then /^the payment request should (not )?be (\w+)$/ do |negative, predicate|
   payment_request.send("should#{negative}", send("be_#{predicate}"))
 end
 
-Then /^a HEAD request should have been made to the external application for the payment request: (\d+) returning status "([^\"]*)"(?: with (.+))?$/ do |id, status, fields|
-  fields = parse_fields(fields)
-  response = AppEngine::URLFetch.responses["HEAD #{external_payment_request_uri(id, fields)}"]
-  response.should_not be_nil
-  "#{response.code} #{response.message}".should == status
+Then /^a HEAD request should have been made to the external application for the payment request: (\d+) with the query string containing: "([^\"]*)"$/ do |id, fields|
+  fields = instance_eval(fields)
+  request = AppEngine::URLFetch.requests["HEAD #{external_payment_request_uri(id, fields)}"]
+  request.should_not be_nil
 end
 
-Then /^a PUT request should have been made to the external application for the payment request: (\d+) returning status "([^\"]*)" containing the paypal response$/ do |id, status|
-  AppEngine::URLFetch.responses.should include(
-    "PUT #{external_payment_request_uri(id)}"
-  )
+Then /^a PUT request should have been made to the external application for the payment request: (\d+), containing: (?:"([^\"]*)"|the paypal response)$/ do |id, payload|
+  request_key = "PUT #{external_payment_request_uri(id)}"
+  AppEngine::URLFetch.requests.should include(request_key)
+  request_payload = AppEngine::URLFetch.requests[request_key][:payload]
+  unless payload
+    request_payload.should ==
+      AppEngine::URLFetch.requests["POST #{paypal_payments_uri}"][:response]
+  end
 end
 
-Then /^a POST request should have been made to my paypal account returning status "([^\"]*)" containing the payment details$/ do |status|
-  AppEngine::URLFetch.responses.should include("POST #{paypal_payments_uri}")
+Then /^a POST request should (not )?have been made to my paypal account(?: containing: (.+))?$/ do |no_request, params|
+  no_request ||= ""
+  no_request = "_not" unless no_request.blank?
+  request_key = "POST #{paypal_payments_uri}"
+  AppEngine::URLFetch.requests.send("should#{no_request}", include(request_key))
+  AppEngine::URLFetch.requests[request_key][:payload].should include(
+    stringify_body(parse_fields(params))) if no_request.blank?
 end
 
 Then /^the response should be (\d+)$/ do |response|
@@ -77,3 +108,4 @@ end
 Then /^no outgoing requests should be made$/ do
   # this is intentionally empty!
 end
+

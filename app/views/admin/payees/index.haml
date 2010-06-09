@@ -3,11 +3,13 @@
   = title
 %h1
   = title
-- if @payees.empty?
-  %p
-    %strong You have no configured payees.
 %p
-  We will never send money to a payee that is not listed here.
+  Welcome to your personal payment application for meh. Your application allows you to pay your suppliers automatically or manually via SMS. It's important to note that we will only ever send payments on your behalf to suppliers that you have configured inside meh.
+%p
+  - if @payees.empty?
+    You currently have no configured payees. This is the default and means that we will send money to any supplier that you have a payment agreement with inside meh. If you add your own payees here then we will only ever send money to these listed payees even if you have other payment agreements configured inside meh. By adding payees here you must manually update this list when you add suppliers and payment agreements to meh.
+  - else
+    You have configured payees. We will never send money to a payee that is not listed here.
   %a{:href => "/admin/payees/new"} Add new
 - unless @payees.empty?
   %table#payees
@@ -26,10 +28,10 @@
           %a{:href => "mailto:#{email}"}
             = email
         %td
-          - amount = payee.maximum_amount
-          - if amount.zero?
+          - if payee.pay_unlimited?
             Unlimited
           - else
+            - amount = payee.maximum_amount
             = h(amount.format(:symbol => false) << " " << amount.currency.iso_code)
         %td
           %a{:href => "/admin/payees/#{payee.id}/edit"}
@@ -42,3 +44,4 @@
               :rel => "nofollow"                    |
             }                                       |
             Delete
+

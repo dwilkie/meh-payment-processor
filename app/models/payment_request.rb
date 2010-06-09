@@ -1,28 +1,63 @@
 class PaymentRequest
   include DataMapper::Resource
   property :id, Serial
-  property :external_id, Integer, :required => true
-  property :params, Yaml
+  property :external_id, Integer, :required => true, :unique => true
+  property :payment_params, Yaml, :required => true
+  property :payee_params, Yaml,   :required => true
   property :payment_response, Text
   property :verified_at, DateTime
+  property :sent_for_processing_at, DateTime
   property :completed_at, DateTime
+  property :status, String
   timestamps :at
 
-  validates_is_unique :external_id
+  def initialize(params)
+    self.external_id = params["external_id"]
+    self.payee_params = params["payee"]
+    self.payment_params = params["payment"]
+  end
+
+  def params
+    { "payment" => payment_params, "payee" => payee_params }
+  end
 
   def verified?
     !verified_at.nil?
   end
-  
+
+  def authorized?
+    verified? &&
+    status != "internally_unauthorized" &&
+    status != "externally_unauthorized"
+  end
+
+  def unauthorized?
+    !authorized?
+  end
+
+  def sent_for_processing?
+    !sent_for_processing_at.nil?
+  end
+
   def completed?
     !completed_at.nil?
   end
-  
+
+  def send_for_processing
+    self.update(:sent_for_processing_at => Time.now)
+  end
+
   def verify
     self.update(:verified_at => Time.now)
   end
-  
+
   def complete(payment_response)
     self.update(:payment_response => payment_response, :completed_at => Time.now)
   end
+
+  def internally_unauthorize
+    self.update(:status => "internally_unauthorized")
+  end
+
 end
+

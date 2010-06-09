@@ -15,16 +15,17 @@ class ExternalPaymentRequest
     @raw_response.code == "200"
   end
 
-  def notify(id, payment_response)
+  def notify(id, notification_data)
     uri = URI.join(
       @external_application_uri,
       "payment_requests/#{id}"
     )
     @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,
-      :payload => payment_response,
+      :payload => notification_data,
       :method => 'PUT'
     )
     @raw_response.code
   end
 end
+
