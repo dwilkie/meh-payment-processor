@@ -18,6 +18,5 @@ gem "dm-aggregates"
 gem "jruby-openssl"
 gem "sinatra"
 gem "haml"
-gem "sinatra-r18n"
 gem "money"
 

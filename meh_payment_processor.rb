@@ -37,13 +37,6 @@ class MehPaymentProcessor < Sinatra::Base
 
   set :skip_forgery_protection, [ "/payment_requests", /^\/tasks\/.+$/ ]
 
-  # All uri's starting with /task are private for the
-  # task queue. NOTE: never use create! with DM because
-  # it will bypass hooks and the observer will not be run
-  post '/tasks/payment_requests' do
-    PaymentRequest.create(params)
-  end
-
   put '/tasks/verify/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     external_payment_request = ExternalPaymentRequest.new(
@@ -76,15 +69,9 @@ class MehPaymentProcessor < Sinatra::Base
     ).notify(params["id"], request.env["rack.input"].read)
   end
 
-  # External request is executed here
-  # We just delegate the work to /tasks/payment_requests/create
-  # for a later time to ensure a fast response time
   post '/payment_requests' do
     # Schedule the creation of a payment request to the queue
-    AppEngine::Labs::TaskQueue.add(
-      request.env["rack.input"].read,
-      :url => '/tasks/payment_requests'
-    )
+    PaymentRequest.create(params)
   end
 
   head '/payment_requests/:id' do
