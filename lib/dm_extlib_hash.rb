@@ -1,5 +1,9 @@
-class Hash
-  class << self
+# modified from
+# http://github.com/datamapper/extlib/blob/master/lib/extlib/hash.rb
+module CoreExtensions
+  module Hash
+    require 'uri'
+    require 'net/http'
     ##
     # Convert to URL query param string
     #
@@ -19,6 +23,31 @@ class Hash
       params = self.map { |k,v| normalize_param(k,v) }.join
       params.chop! # trailing &
       params
+    end
+
+    ##
+    # Convert to body string for PUT or POST request
+    #
+    #   hash = { :name => "Bob",
+    #     :address => {
+    #       :street => '111 Ruby Ave.',
+    #       :city => 'Ruby Central',
+    #       :phones => ['111-111-1111', '222-222-2222']
+    #     }
+    #   }.to_body
+    #     #=> "name=Bob&address=%5b%3astreet%2c%20%22111%20Ruby%20Ave.%22%5d&address=%5b%3acity%2c%20%22Ruby%20Central%22%5d&address=%5b%3aphones%2c%20%5b%22111-111-1111%22%2c%20%22222-222-2222%22%5d%5d"
+    #     CGI.unescape(hash)
+    #       #=> "name=Bob&address=[:street, "111 Ruby Ave."]&address=[:city, "Ruby Central"]&address=[:phones, ["111-111-1111", "222-222-2222"]]"
+    #
+    # Note: Escape characters \" omitted for brevity
+    #
+    # @return [String] This hash as a body string
+    #
+    # @api public
+    def to_body
+      req = Net::HTTP::Post.new("/some_path")
+      req.set_form_data(self)
+      req.body
     end
 
     ##
@@ -54,8 +83,13 @@ class Hash
           end
         end
       end
-      
+
       param
     end
   end
 end
+
+class Hash
+  include CoreExtensions::Hash
+end
+

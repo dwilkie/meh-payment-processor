@@ -4,7 +4,9 @@ class ExternalPaymentRequest
     @external_application_uri = external_application_uri
   end
 
-  def verified?(id, params)
+  def verified?(payment_request)
+    params = payment_request.params
+    id = params.delete("external_id")
     uri = URI.join(
       @external_application_uri,
       "payment_requests/#{id}"

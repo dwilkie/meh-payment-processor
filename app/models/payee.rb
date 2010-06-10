@@ -37,12 +37,13 @@ class Payee
         if payee
           unless payee.pay_unlimited?
             maximum_amount = payee.maximum_amount
-            if maximum_amount.currency == params["currency"]
-              if maximum_amount < Money.new(amount.to_money, currency)
-                errors = {:payee_maximum_amount_exceeded => true}
+            if maximum_amount.currency == params["currency"].to_currency
+              amount = params["amount"] << " " << params["currency"]
+              if maximum_amount < amount.to_money
+                errors = {"payee_maximum_amount_exceeded" => true}
               end
             else
-              errors = {:payee_currency_invalid => true}
+              errors = {"payee_currency_invalid" => true}
             end
           end
         else
@@ -52,6 +53,7 @@ class Payee
     else
       errors = {"invalid_payee_details" => true}
     end
+    errors = {"errors" => errors} if errors
     errors
   end
 

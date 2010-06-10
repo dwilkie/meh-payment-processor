@@ -22,10 +22,9 @@ class PaymentRequestObserver
         :method => 'PUT'
       )
     else
-      self.internally_unauthorize
+      self.internally_unauthorize(authorization_errors)
       AppEngine::Labs::TaskQueue.add(
-        nil,
-        :params => authorization_errors,
+        self.internal_errors,
         :url => "/tasks/external_payment_requests/#{self.external_id}",
         :method => 'PUT'
       )

@@ -30,7 +30,7 @@ class PaypalPaymentRequest
     )
 
     request_body.merge!(params)
-    request_body = stringify_body(request_body)
+    request_body = request_body.to_body
 
     @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,
@@ -52,17 +52,12 @@ class PaypalPaymentRequest
         "X-PAYPAL-APPLICATION-ID" => @app_id
        }
     end
-    
+
     def body(action)
       {
         "requestEnvelope.errorLanguage" => "en_US",
         "actionType" => action
       }
     end
-    
-    def stringify_body(body)
-      req = Net::HTTP::Post.new("/some_path")
-      req.set_form_data(body)
-      req.body
-    end
 end
+

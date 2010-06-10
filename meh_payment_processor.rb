@@ -49,17 +49,13 @@ class MehPaymentProcessor < Sinatra::Base
     external_payment_request = ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
     )
-    if external_payment_request.verified?(
-      payment_request.external_id,
-      payment_request.params
-    )
-      payment_request.verify
-    end
+    external_payment_request.verified?(payment_request) ? payment_request.verify :
+      payment_request.externally_unauthorize
   end
 
   put '/tasks/process/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
-    if payment_request.verified? && !payment_request.sent_for_processing?
+    if payment_request.authorized? && !payment_request.sent_for_processing?
       payment_request.send_for_processing
       paypal_payment_request = PaypalPaymentRequest.new(
         app_settings['paypal']['api_credentials']
@@ -94,7 +90,6 @@ class MehPaymentProcessor < Sinatra::Base
   head '/payment_requests/:id' do
     payment_request = PaymentRequest.get(params[:id])
     if payment_request && payment_request.completed?
-      merged_params = params.merge(:external_id => payment_request.external_id)
       merged_params = params.merge(payment_request.params)
       merged_params == params ? 200 : 404
     else

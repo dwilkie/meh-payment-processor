@@ -11,7 +11,6 @@ require 'dm-core'
 require 'dm-migrations'
 require 'dm-transactions'
 require 'fakeweb'
-require 'httparty'
 require 'ruby-debug'
 require 'database_cleaner'
 require 'database_cleaner/cucumber'
@@ -25,10 +24,8 @@ DatabaseCleaner.strategy = :transaction
 class MyWorld
   require File.join(File.dirname(__FILE__), './pickle')
   require File.join(File.dirname(__FILE__), './fakeweb_helper')
-  require File.join(File.dirname(__FILE__), './uri_helpers')
   include Pickle
   include FakeWebHelper
-  include URIHelpers
   include Rack::Test::Methods
   include Rspec::Matchers
 

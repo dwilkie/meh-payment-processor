@@ -5,6 +5,7 @@ class PaymentRequest
   property :payment_params, Yaml, :required => true
   property :payee_params, Yaml,   :required => true
   property :payment_response, Text
+  property :internal_errors, Text
   property :verified_at, DateTime
   property :sent_for_processing_at, DateTime
   property :completed_at, DateTime
@@ -18,7 +19,7 @@ class PaymentRequest
   end
 
   def params
-    { "payment" => payment_params, "payee" => payee_params }
+    { "payment" => payment_params, "payee" => payee_params, "external_id" => external_id.to_s }
   end
 
   def verified?
@@ -26,13 +27,12 @@ class PaymentRequest
   end
 
   def authorized?
-    verified? &&
-    status != "internally_unauthorized" &&
-    status != "externally_unauthorized"
+    verified? && !unauthorized?
   end
 
   def unauthorized?
-    !authorized?
+    status == "internally_unauthorized" ||
+    status == "externally_unauthorized"
   end
 
   def sent_for_processing?
@@ -55,8 +55,12 @@ class PaymentRequest
     self.update(:payment_response => payment_response, :completed_at => Time.now)
   end
 
-  def internally_unauthorize
-    self.update(:status => "internally_unauthorized")
+  def internally_unauthorize(errors)
+    self.update(:status => "internally_unauthorized", :internal_errors => errors.to_body)
+  end
+
+  def externally_unauthorize
+    self.update(:status => "externally_unauthorized")
   end
 
 end
