@@ -78,7 +78,7 @@ class MehPaymentProcessor < Sinatra::Base
   head '/payment_requests/:id' do
     payment_request = PaymentRequest.get(params["id"])
     if payment_request && payment_request.completed?
-      merged_params = params.merge(payment_request.params)
+      merged_params = params.merge(payment_request.notification)
       merged_params == params ? 200 : 404
     else
       404

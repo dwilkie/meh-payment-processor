@@ -25,7 +25,7 @@ class ExternalPaymentRequest
       @external_application_uri,
       "payment_requests/#{payment_request.external_id}"
     )
-    notification = payment_request.notification.from_query.merge(
+    notification = payment_request.notification.merge(
       "id" => payment_request.id.to_s
     )
     notification = {"payment_request" => notification}.to_query

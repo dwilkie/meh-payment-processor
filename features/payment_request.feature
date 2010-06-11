@@ -57,7 +57,6 @@ Feature: Payment Request
     And the payment request should be unauthorized
     And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'payee_maximum_amount_exceeded' => true}"
 
-  @current
   Scenario: I have configured a payee in my app and a payment request is received from the configured external app to pay the configured payee but for a currency that is different than the one set for the configured payee
     Given a payee exists with email: "johnny@gmail.com", maximum_amount: "500.00", currency: "THB"
 
@@ -93,7 +92,7 @@ Feature: Payment Request
     And the payment request should be unauthorized
 
   Scenario: A CSRF attack triggers the process payment request task for a payment request that was already completed
-    Given a completed payment request exists with id: 12345, "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'supplier@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'supplier@gmail.com'} }"
+    Given a completed payment request exists with id: 12345
     And I am logged in
 
     When I am CSRF attacked to trigger the process payment request task for the payment request: 12345
@@ -101,7 +100,7 @@ Feature: Payment Request
     Then a POST request should not have been made to my paypal account
 
   Scenario: A CSRF attack triggers the process payment request task for a payment request that was already sent for processing but has not yet been completed
-    Given a processing payment request exists with id: 12345, "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'supplier@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'supplier@gmail.com'} }"
+    Given a processing payment request exists with id: 12345
     And I am logged in
 
     When I am CSRF attacked to trigger the process payment request task for the payment request: 12345
@@ -109,7 +108,7 @@ Feature: Payment Request
     Then a POST request should not have been made to my paypal account
 
   Scenario: A CSRF attack triggers the process payment request task for a payment request that is not yet verified (i.e. the payment request has been created but the external app hasn't got back to us yet)
-    Given a payment request exists with id: 12345, "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'supplier@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'supplier@gmail.com'} }"
+    Given a payment request exists with id: 12345
     And I am logged in
 
     When I am CSRF attacked to trigger the process payment request task for the payment request: 12345
@@ -117,7 +116,7 @@ Feature: Payment Request
     Then a POST request should not have been made to my paypal account
 
   Scenario: A CSRF attack triggers the process payment request task for a payment request that is internally unauthorized (i.e. I set up payee restrictions internally that did not accomodate the request)
-    Given an internally unauthorized payment request exists with id: 12345, "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'supplier@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'supplier@gmail.com'} }"
+    Given an internally unauthorized payment request exists with id: 12345
     And I am logged in
 
     When I am CSRF attacked to trigger the process payment request task for the payment request: 12345
@@ -125,7 +124,7 @@ Feature: Payment Request
     Then a POST request should not have been made to my paypal account
 
   Scenario: A CSRF attack triggers the process payment request task for a payment request that is externally unauthorized (i.e. the payment request was not made by the configured externaly application)
-    Given an externally unauthorized payment request exists with id: 12345, "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'attacker@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'attacker@gmail.com'} }"
+    Given an externally unauthorized payment request exists with id: 12345
     And I am logged in
 
     When I am CSRF attacked to trigger the process payment request task for the payment request: 12345

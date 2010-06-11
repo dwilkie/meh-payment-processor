@@ -1,17 +1,21 @@
-Given /^an? (externally unauthorized |internally unauthorized |verified |processing |completed )?payment request exists with:? (?:id: (\d+), )"([^\"]*)"$/ do |status, id, fields|
+Given /^an? (externally unauthorized |internally unauthorized |verified |processing |completed )?payment request exists(?: with )?(?:id: (\d+))?(?:, (.+))?$/ do |status, id, fields|
   register_external_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
   register_external_payment_request(:put, ["200", "OK"])
-  fields = instance_eval(fields)
-  payment_request = PaymentRequest.new(fields)
+  payment_request = PaymentRequest.new(
+    "external_id" => "12345",
+    "payee" => {"email" => "m@g.com", "amount" => "5", "currency" => "THB"},
+    "payment" => {"details" => "something"}
+  )
   payment_request.id = id.to_i if id
   payment_request.save
+  payment_request.update(parse_fields(fields)) if fields
   unless status =~ /^completed/
     payment_request = PaymentRequest.get(id)
     unless status =~ /^processing/
       unless status =~ /^verified/
         if status =~ /^internally unauthorized/
-          payment_request.internally_unauthorize("errors" => {"some_error" => true})
+          payment_request.internally_unauthorize("some_error" => true)
         elsif status =~ /^externally unauthorized/
           payment_request.externally_unauthorize
         end

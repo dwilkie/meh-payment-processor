@@ -73,7 +73,8 @@ class PaymentRequest
   end
 
   def notification
-    self.internal_errors ? self.internal_errors : self.payment_response
+    notification = self.internal_errors ? self.internal_errors : self.payment_response
+    notification.from_query
   end
 end
 
