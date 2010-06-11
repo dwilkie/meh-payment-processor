@@ -19,4 +19,5 @@ gem "jruby-openssl"
 gem "sinatra"
 gem "haml"
 gem "money"
+gem "addressable"
 

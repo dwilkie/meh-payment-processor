@@ -11,21 +11,30 @@ class ExternalPaymentRequest
       @external_application_uri,
       "payment_requests/#{id}"
     )
-    uri.query = params.to_params
+    uri.query = params.to_query
     uri = uri.to_s
-    @raw_response = AppEngine::URLFetch.fetch(uri, :method => 'HEAD')
+    @raw_response = AppEngine::URLFetch.fetch(
+      uri,
+      :method => 'HEAD'
+    )
     @raw_response.code == "200"
   end
 
-  def notify(id, notification_data)
+  def notify(payment_request)
     uri = URI.join(
       @external_application_uri,
-      "payment_requests/#{id}"
+      "payment_requests/#{payment_request.external_id}"
     )
+    notification = payment_request.notification.from_query.merge(
+      "id" => payment_request.id.to_s
+    )
+    notification = {"payment_request" => notification}.to_query
     @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,
-      :payload => notification_data,
-      :method => 'PUT'
+      :payload => notification,
+      :method => 'PUT',
+      :follow_redirects => false,
+      :headers => {"Content-Type" => "application/x-www-form-urlencoded"}
     )
     @raw_response.code
   end

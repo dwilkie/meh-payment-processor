@@ -81,15 +81,18 @@ Then /^a HEAD request should have been made to the external application for the 
 end
 
 Then /^a PUT request should have been made to the external application for the payment request: (\d+), containing: (?:the paypal response|"([^\"]*)")$/ do |id, payload|
+  payment_request = find_model!("payment_request")
   request_key = "PUT #{external_payment_request_uri(id)}"
   AppEngine::URLFetch.requests.should include(request_key)
   request_payload = AppEngine::URLFetch.requests[request_key][:payload]
   unless payload
-    request_payload.should ==
+    payload = paypal_response_payload(
       AppEngine::URLFetch.requests["POST #{paypal_payments_uri}"][:response]
+    )
   else
-    request_payload.should == instance_eval(payload).to_body
+    payload = internal_errors_payload(instance_eval(payload).to_query)
   end
+  request_payload.should == notification_payload(payment_request.id, payload)
 end
 
 Then /^a POST request should (not )?have been made to my paypal account(?: containing: (.+))?$/ do |no_request, params|
@@ -98,7 +101,7 @@ Then /^a POST request should (not )?have been made to my paypal account(?: conta
   request_key = "POST #{paypal_payments_uri}"
   AppEngine::URLFetch.requests.send("should#{no_request}", include(request_key))
   AppEngine::URLFetch.requests[request_key][:payload].should include(
-    parse_fields(params).to_body) if no_request.blank?
+    parse_fields(params).to_query) if no_request.blank?
 end
 
 Then /^the response should be (\d+)$/ do |response|

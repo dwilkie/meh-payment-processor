@@ -5,7 +5,7 @@ require 'dm-validations'
 require 'dm-observer'
 require 'dm-types'
 require 'haml'
-require './lib/dm_extlib_hash'
+require './lib/core_extensions'
 require './app/models/payment_request'
 require './app/models/payment_request_observer'
 require './app/models/external_payment_request'
@@ -38,7 +38,7 @@ class MehPaymentProcessor < Sinatra::Base
   set :skip_forgery_protection, [ "/payment_requests", /^\/tasks\/.+$/ ]
 
   put '/tasks/verify/payment_requests/:id' do
-    payment_request = PaymentRequest.get(params[:id])
+    payment_request = PaymentRequest.get(params["id"])
     external_payment_request = ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
     )
@@ -47,7 +47,7 @@ class MehPaymentProcessor < Sinatra::Base
   end
 
   put '/tasks/process/payment_requests/:id' do
-    payment_request = PaymentRequest.get(params[:id])
+    payment_request = PaymentRequest.get(params["id"])
     if payment_request.authorized? && !payment_request.sent_for_processing?
       payment_request.send_for_processing
       paypal_payment_request = PaypalPaymentRequest.new(
@@ -64,9 +64,10 @@ class MehPaymentProcessor < Sinatra::Base
   end
 
   put '/tasks/external_payment_requests/:id' do
+    payment_request = PaymentRequest.get(params["id"])
     ExternalPaymentRequest.new(
       app_settings['external_application']['uri']
-    ).notify(params["id"], request.env["rack.input"].read)
+    ).notify(payment_request)
   end
 
   post '/payment_requests' do
@@ -75,7 +76,7 @@ class MehPaymentProcessor < Sinatra::Base
   end
 
   head '/payment_requests/:id' do
-    payment_request = PaymentRequest.get(params[:id])
+    payment_request = PaymentRequest.get(params["id"])
     if payment_request && payment_request.completed?
       merged_params = params.merge(payment_request.params)
       merged_params == params ? 200 : 404

@@ -52,16 +52,28 @@ class PaymentRequest
   end
 
   def complete(payment_response)
-    self.update(:payment_response => payment_response, :completed_at => Time.now)
+    payment_response = payment_response.from_query
+    payment_response = {"payment_response" => payment_response}
+    self.update(
+      :payment_response => payment_response.to_query,
+      :completed_at => Time.now
+    )
   end
 
   def internally_unauthorize(errors)
-    self.update(:status => "internally_unauthorized", :internal_errors => errors.to_body)
+    errors = {"errors" => errors}.to_query
+    self.update(
+      :status => "internally_unauthorized",
+      :internal_errors => errors
+    )
   end
 
   def externally_unauthorize
     self.update(:status => "externally_unauthorized")
   end
 
+  def notification
+    self.internal_errors ? self.internal_errors : self.payment_response
+  end
 end
 

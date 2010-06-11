@@ -42,7 +42,7 @@ Feature: Payment Request
 
     Then a POST request should not have been made to my paypal account
     And the payment request should be unauthorized
-    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'errors' => {'payee_not_found' => true}}"
+    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'payee_not_found' => true}"
 
   Scenario: I have configured a payee in my app and a payment request is received from the configured external app to pay the configured payee but for an amount greater than the maximum allowed for this payee
     Given a payee exists with email: "johnny@gmail.com", maximum_amount: "500.00", currency: "THB"
@@ -55,8 +55,9 @@ Feature: Payment Request
 
     Then a POST request should not have been made to my paypal account
     And the payment request should be unauthorized
-    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'errors' => {'payee_maximum_amount_exceeded' => true}}"
+    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'payee_maximum_amount_exceeded' => true}"
 
+  @current
   Scenario: I have configured a payee in my app and a payment request is received from the configured external app to pay the configured payee but for a currency that is different than the one set for the configured payee
     Given a payee exists with email: "johnny@gmail.com", maximum_amount: "500.00", currency: "THB"
 
@@ -69,7 +70,7 @@ Feature: Payment Request
     Then a POST request should not have been made to my paypal account
     And the payment request should be unauthorized
 
-    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'errors' => {'payee_currency_invalid' => true}}"
+    And a PUT request should have been made to the external application for the payment request: 347752, containing: "{'payee_currency_invalid' => true}"
 
   Scenario: A payment request is received with a duplicate external_id
     When a payment request is received with: "{'external_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'} }"

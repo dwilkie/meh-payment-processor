@@ -18,13 +18,28 @@ module FakeWebHelper
   end
 
   def external_payment_request_uri(id, fields=nil)
-    uri = "http://localhost:3000/payment_requests/#{id}"
-    uri << "?#{fields.to_params}" if fields
-    uri
+    uri = URI.parse("http://localhost:3000/payment_requests/#{id}")
+    uri.query = fields.to_query if fields
+    uri.to_s
   end
 
   def paypal_payments_uri
     "https://svcs.sandbox.paypal.com/AdaptivePayments/Pay"
+  end
+
+  def paypal_response_payload(payload)
+    payload = payload.from_query
+    {"payment_response" => payload}.to_query
+  end
+
+  def internal_errors_payload(payload)
+    payload = payload.from_query
+    {"errors" => payload}.to_query
+  end
+
+  def notification_payload(id, payload)
+    payload = payload.from_query.merge("id" => id.to_s)
+    {"payment_request" => payload}.to_query
   end
 end
 

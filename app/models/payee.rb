@@ -53,7 +53,6 @@ class Payee
     else
       errors = {"invalid_payee_details" => true}
     end
-    errors = {"errors" => errors} if errors
     errors
   end
 

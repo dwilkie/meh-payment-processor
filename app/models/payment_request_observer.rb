@@ -24,8 +24,8 @@ class PaymentRequestObserver
     else
       self.internally_unauthorize(authorization_errors)
       AppEngine::Labs::TaskQueue.add(
-        self.internal_errors,
-        :url => "/tasks/external_payment_requests/#{self.external_id}",
+        nil,
+        :url => "/tasks/external_payment_requests/#{self.id}",
         :method => 'PUT'
       )
     end
@@ -35,8 +35,8 @@ class PaymentRequestObserver
   # Update (i.e. PUT) the external payment request
   after :complete do
     AppEngine::Labs::TaskQueue.add(
-      self.payment_response,
-      :url => "/tasks/external_payment_requests/#{self.external_id}",
+      nil,
+      :url => "/tasks/external_payment_requests/#{self.id}",
       :method => 'PUT'
     )
   end

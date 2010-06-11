@@ -30,7 +30,7 @@ class PaypalPaymentRequest
     )
 
     request_body.merge!(params)
-    request_body = request_body.to_body
+    request_body = request_body.to_query
 
     @raw_response = AppEngine::URLFetch.fetch(
       uri.to_s,
