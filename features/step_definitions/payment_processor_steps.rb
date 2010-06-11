@@ -3,7 +3,7 @@ Given /^an? (remotely unauthorized |internally unauthorized |verified |processin
   register_paypal_payment_request
   register_remote_payment_request(:put, ["200", "OK"])
   payment_request = PaymentRequest.new(
-    "remote_id" => "12345",
+    "id" => "12345",
     "payee" => {"email" => "m@g.com", "amount" => "5", "currency" => "THB"},
     "payment" => {"details" => "something"}
   )

@@ -71,8 +71,7 @@ class MehPaymentProcessor < Sinatra::Base
   end
 
   post '/payment_requests' do
-    # Schedule the creation of a payment request to the queue
-    PaymentRequest.create(params)
+    PaymentRequest.create(params["payment_request"])
   end
 
   head '/payment_requests/:id' do

@@ -6,7 +6,7 @@ Feature: Payment Request
   Scenario: A payment request is received from the configured remote application and I have not configured any payees in my app (default)
     Given I have not configured any payees
 
-    When the configured remote application makes a payment request with: "{'remote_id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'someone@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'someone@gmail.com'} }"
+    When the configured remote application makes a payment request with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'someone@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'someone@gmail.com'}}}"
 
     Then a payment_request should exist with remote_id: 347752
     And a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'someone@gmail.com'}, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'someone@gmail.com' } }"
@@ -21,7 +21,7 @@ Feature: Payment Request
   Scenario: I have configured a payee in my app and a payment request is received from the configured remote app to pay the configured payee
     Given a payee exists with email: "johnny@gmail.com"
 
-    When the configured remote application makes a payment request with: "{'remote_id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'} }"
+    When the configured remote application makes a payment request with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'}}}"
 
     Then a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'}, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny@gmail.com' } }"
 
@@ -34,7 +34,7 @@ Feature: Payment Request
   Scenario: I have configured a payee in my app and a payment request is received from the configured remote app to pay a different payee
     Given a payee exists with email: "johnny@gmail.com"
 
-    When the configured remote application makes a payment request with: "{'remote_id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny2@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny2@gmail.com'} }"
+    When the configured remote application makes a payment request with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny2@gmail.com' }, 'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny2@gmail.com'}}}"
 
     Then a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '5000.00', 'currency' => 'THB', 'receiver' => 'johnny2@gmail.com'}, 'payee' => { 'amount' => '5000.00', 'currency' => 'THB', 'email' => 'johnny2@gmail.com' } }"
 
@@ -47,7 +47,7 @@ Feature: Payment Request
   Scenario: I have configured a payee in my app and a payment request is received from the configured remote app to pay the configured payee but for an amount greater than the maximum allowed for this payee
     Given a payee exists with email: "johnny@gmail.com", maximum_amount: "500.00", currency: "THB"
 
-    When the configured remote application makes a payment request with: "{'remote_id' => 347752, 'payee' => { 'amount' => '500.01', 'currency' => 'THB', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.01', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'} }"
+    When the configured remote application makes a payment request with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '500.01', 'currency' => 'THB', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.01', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'}}}"
 
     Then a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '500.01', 'currency' => 'THB', 'receiver' => 'johnny@gmail.com'}, 'payee' => { 'amount' => '500.01', 'currency' => 'THB', 'email' => 'johnny@gmail.com' } }"
 
@@ -60,7 +60,7 @@ Feature: Payment Request
   Scenario: I have configured a payee in my app and a payment request is received from the configured remote app to pay the configured payee but for a currency that is different than the one set for the configured payee
     Given a payee exists with email: "johnny@gmail.com", maximum_amount: "500.00", currency: "THB"
 
-    When the configured remote application makes a payment request with: "{'remote_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'} }"
+    When the configured remote application makes a payment request with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'}}}"
 
     Then a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'}, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' } }"
 
@@ -72,7 +72,7 @@ Feature: Payment Request
     And a PUT request should have been made to the remote application for the payment request: 347752, containing: "{'payee_currency_invalid' => true}"
 
   Scenario: A payment request is received with a duplicate remote_id
-    When a payment request is received with: "{'remote_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'} }"
+    When a payment request is received with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'}}}"
 
     And another payment request is received with: "{'remote_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'johnny@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'johnny@gmail.com'} }"
 
@@ -81,7 +81,7 @@ Feature: Payment Request
     And the payment request should not be verified
 
   Scenario: A payment request is received but it was not from the configured remote application
-    When a payment request is received with: "{'remote_id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'attacker@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'attacker@gmail.com'} }"
+    When a payment request is received with: "{'payment_request' => {'id' => 347752, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'attacker@gmail.com' }, 'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'attacker@gmail.com'}}}"
 
     Then a payment_request should be created with remote_id: 347752
     And a HEAD request should have been made to the remote application for the payment request: 347752, with the query string containing: "{'payment' => { 'amount' => '500.00', 'currency' => 'USD', 'receiver' => 'attacker@gmail.com'}, 'payee' => { 'amount' => '500.00', 'currency' => 'USD', 'email' => 'attacker@gmail.com' } }"

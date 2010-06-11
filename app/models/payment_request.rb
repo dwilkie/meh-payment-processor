@@ -13,9 +13,11 @@ class PaymentRequest
   timestamps :at
 
   def initialize(params)
-    self.remote_id = params["remote_id"]
-    self.payee_params = params["payee"]
-    self.payment_params = params["payment"]
+    if params
+      self.remote_id = params["id"]
+      self.payee_params = params["payee"]
+      self.payment_params = params["payment"]
+    end
   end
 
   def params
