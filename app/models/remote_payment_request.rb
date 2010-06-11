@@ -1,14 +1,14 @@
-# Represents a PaymentRequest resource on the external application
-class ExternalPaymentRequest
-  def initialize(external_application_uri)
-    @external_application_uri = external_application_uri
+# Represents the remote PaymentRequest resource
+class RemotePaymentRequest
+  def initialize(remote_application_uri)
+    @remote_application_uri = remote_application_uri
   end
 
   def verified?(payment_request)
     params = payment_request.params
-    id = params.delete("external_id")
+    id = params.delete("remote_id")
     uri = URI.join(
-      @external_application_uri,
+      @remote_application_uri,
       "payment_requests/#{id}"
     )
     uri.query = params.to_query
@@ -22,8 +22,8 @@ class ExternalPaymentRequest
 
   def notify(payment_request)
     uri = URI.join(
-      @external_application_uri,
-      "payment_requests/#{payment_request.external_id}"
+      @remote_application_uri,
+      "payment_requests/#{payment_request.remote_id}"
     )
     notification = payment_request.notification.merge(
       "id" => payment_request.id.to_s

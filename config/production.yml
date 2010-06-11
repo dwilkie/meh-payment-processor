@@ -1,6 +1,6 @@
 my_application:
   uri: "http://my_app_id.appspot.com"
-external_application:
+remote_application:
   uri: ""
 paypal:
   uri: "https://svcs.paypal.com"

@@ -8,7 +8,7 @@ require 'haml'
 require './lib/core_extensions'
 require './app/models/payment_request'
 require './app/models/payment_request_observer'
-require './app/models/external_payment_request'
+require './app/models/remote_payment_request'
 require './app/models/paypal_payment_request'
 require './app/models/payee'
 require './app/helpers/application_helper'
@@ -39,11 +39,11 @@ class MehPaymentProcessor < Sinatra::Base
 
   put '/tasks/verify/payment_requests/:id' do
     payment_request = PaymentRequest.get(params["id"])
-    external_payment_request = ExternalPaymentRequest.new(
-      app_settings['external_application']['uri']
+    remote_payment_request = RemotePaymentRequest.new(
+      app_settings['remote_application']['uri']
     )
-    external_payment_request.verified?(payment_request) ? payment_request.verify :
-      payment_request.externally_unauthorize
+    remote_payment_request.verified?(payment_request) ? payment_request.verify :
+      payment_request.remotely_unauthorize
   end
 
   put '/tasks/process/payment_requests/:id' do
@@ -63,10 +63,10 @@ class MehPaymentProcessor < Sinatra::Base
     end
   end
 
-  put '/tasks/external_payment_requests/:id' do
+  put '/tasks/remote_payment_requests/:id' do
     payment_request = PaymentRequest.get(params["id"])
-    ExternalPaymentRequest.new(
-      app_settings['external_application']['uri']
+    RemotePaymentRequest.new(
+      app_settings['remote_application']['uri']
     ).notify(payment_request)
   end
 

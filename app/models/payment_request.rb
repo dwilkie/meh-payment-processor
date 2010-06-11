@@ -1,7 +1,7 @@
 class PaymentRequest
   include DataMapper::Resource
   property :id, Serial
-  property :external_id, Integer, :required => true, :unique => true
+  property :remote_id, Integer, :required => true, :unique => true
   property :payment_params, Yaml, :required => true
   property :payee_params, Yaml,   :required => true
   property :payment_response, Text
@@ -13,13 +13,13 @@ class PaymentRequest
   timestamps :at
 
   def initialize(params)
-    self.external_id = params["external_id"]
+    self.remote_id = params["remote_id"]
     self.payee_params = params["payee"]
     self.payment_params = params["payment"]
   end
 
   def params
-    { "payment" => payment_params, "payee" => payee_params, "external_id" => external_id.to_s }
+    { "payment" => payment_params, "payee" => payee_params, "remote_id" => remote_id.to_s }
   end
 
   def verified?
@@ -32,7 +32,7 @@ class PaymentRequest
 
   def unauthorized?
     status == "internally_unauthorized" ||
-    status == "externally_unauthorized"
+    status == "remotely_unauthorized"
   end
 
   def sent_for_processing?
@@ -68,8 +68,8 @@ class PaymentRequest
     )
   end
 
-  def externally_unauthorize
-    self.update(:status => "externally_unauthorized")
+  def remotely_unauthorize
+    self.update(:status => "remotely_unauthorized")
   end
 
   def notification

@@ -1,5 +1,5 @@
 Feature: Payment Request Notification verification
-  In order to prevent unauthorized payment notifications made to the external application from having an affect on me
+  In order to prevent unauthorized payment notifications made to the remote application from having an affect on me
   As an owner of this application
   I want to verify that a payment notification was made by this application
 

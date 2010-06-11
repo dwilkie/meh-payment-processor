@@ -1,9 +1,9 @@
-Given /^an? (externally unauthorized |internally unauthorized |verified |processing |completed )?payment request exists(?: with )?(?:id: (\d+))?(?:, (.+))?$/ do |status, id, fields|
-  register_external_payment_request(:head, ["200", "OK"])
+Given /^an? (remotely unauthorized |internally unauthorized |verified |processing |completed )?payment request exists(?: with )?(?:id: (\d+))?(?:, (.+))?$/ do |status, id, fields|
+  register_remote_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
-  register_external_payment_request(:put, ["200", "OK"])
+  register_remote_payment_request(:put, ["200", "OK"])
   payment_request = PaymentRequest.new(
-    "external_id" => "12345",
+    "remote_id" => "12345",
     "payee" => {"email" => "m@g.com", "amount" => "5", "currency" => "THB"},
     "payment" => {"details" => "something"}
   )
@@ -16,8 +16,8 @@ Given /^an? (externally unauthorized |internally unauthorized |verified |process
       unless status =~ /^verified/
         if status =~ /^internally unauthorized/
           payment_request.internally_unauthorize("some_error" => true)
-        elsif status =~ /^externally unauthorized/
-          payment_request.externally_unauthorize
+        elsif status =~ /^remotely unauthorized/
+          payment_request.remotely_unauthorize
         end
         payment_request.verified_at = nil
       end
@@ -41,7 +41,7 @@ Given /^I have not configured any payees$/ do
 end
 
 When /^a payment request is received with: "([^\"]*)"$/ do |fields|
-  register_external_payment_request(:head, ["404", "Not Found"])
+  register_remote_payment_request(:head, ["404", "Not Found"])
   post "/payment_requests", instance_eval(fields)
 end
 
@@ -50,10 +50,10 @@ When /^another payment request is received with: "([^\"]*)"$/ do |fields|
   post "/payment_requests", instance_eval(fields)
 end
 
-When /^the configured external application makes a payment request with: "([^\"]*)"$/ do |fields|
-  register_external_payment_request(:head, ["200", "OK"])
+When /^the configured remote application makes a payment request with: "([^\"]*)"$/ do |fields|
+  register_remote_payment_request(:head, ["200", "OK"])
   register_paypal_payment_request
-  register_external_payment_request(:put, ["200", "OK"])
+  register_remote_payment_request(:put, ["200", "OK"])
   post "/payment_requests", instance_eval(fields)
 end
 
@@ -78,15 +78,15 @@ Then /^the payment request should (not )?be (\w+)$/ do |negative, predicate|
   payment_request.send("should#{negative}", send("be_#{predicate}"))
 end
 
-Then /^a HEAD request should have been made to the external application for the payment request: (\d+), with the query string containing: "([^\"]*)"$/ do |id, fields|
+Then /^a HEAD request should have been made to the remote application for the payment request: (\d+), with the query string containing: "([^\"]*)"$/ do |id, fields|
   fields = instance_eval(fields)
-  request = AppEngine::URLFetch.requests["HEAD #{external_payment_request_uri(id, fields)}"]
+  request = AppEngine::URLFetch.requests["HEAD #{remote_payment_request_uri(id, fields)}"]
   request.should_not be_nil
 end
 
-Then /^a PUT request should have been made to the external application for the payment request: (\d+), containing: (?:the paypal response|"([^\"]*)")$/ do |id, payload|
+Then /^a PUT request should have been made to the remote application for the payment request: (\d+), containing: (?:the paypal response|"([^\"]*)")$/ do |id, payload|
   payment_request = find_model!("payment_request")
-  request_key = "PUT #{external_payment_request_uri(id)}"
+  request_key = "PUT #{remote_payment_request_uri(id)}"
   AppEngine::URLFetch.requests.should include(request_key)
   request_payload = AppEngine::URLFetch.requests[request_key][:payload]
   unless payload

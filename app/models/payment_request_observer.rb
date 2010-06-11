@@ -13,7 +13,7 @@ class PaymentRequestObserver
   end
 
   # After it's verified check if its internally authenticated
-  # then Process (update i.e. PUT) it, or notify the external app
+  # then Process (update i.e. PUT) it, or notify the remote app
   after :verify do
     unless authorization_errors = Payee.authorization_errors(self.payee_params)
       AppEngine::Labs::TaskQueue.add(
@@ -25,18 +25,18 @@ class PaymentRequestObserver
       self.internally_unauthorize(authorization_errors)
       AppEngine::Labs::TaskQueue.add(
         nil,
-        :url => "/tasks/external_payment_requests/#{self.id}",
+        :url => "/tasks/remote_payment_requests/#{self.id}",
         :method => 'PUT'
       )
     end
   end
 
   # After it's completed
-  # Update (i.e. PUT) the external payment request
+  # Update (i.e. PUT) the remote payment request
   after :complete do
     AppEngine::Labs::TaskQueue.add(
       nil,
-      :url => "/tasks/external_payment_requests/#{self.id}",
+      :url => "/tasks/remote_payment_requests/#{self.id}",
       :method => 'PUT'
     )
   end
