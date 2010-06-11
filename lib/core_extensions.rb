@@ -4,7 +4,8 @@ module CoreExtensions
     def to_query
       uri = Addressable::URI.new
       uri.query_values = self
-      uri.query
+      uri.query = Addressable::URI.normalize_component(uri.query)
+      Addressable::URI.encode(uri.query)
     end
   end
 
