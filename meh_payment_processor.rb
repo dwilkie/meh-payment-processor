@@ -42,8 +42,7 @@ class MehPaymentProcessor < Sinatra::Base
     remote_payment_request = RemotePaymentRequest.new(
       app_settings['remote_application']['uri']
     )
-    remote_payment_request.verified?(payment_request) ? payment_request.verify :
-      payment_request.remotely_unauthorize
+    remote_payment_request.verify(payment_request)
   end
 
   put '/tasks/process/payment_requests/:id' do
