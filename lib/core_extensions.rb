@@ -4,8 +4,7 @@ module CoreExtensions
     def to_query
       uri = Addressable::URI.new
       uri.query_values = self.stringify
-      uri.query = Addressable::URI.normalize_component(uri.query)
-      Addressable::URI.encode(uri.query)
+      uri.query.gsub("[", "%5B").gsub("]", "%5D")
     end
 
     def stringify
