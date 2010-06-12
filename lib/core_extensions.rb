@@ -3,9 +3,27 @@ module CoreExtensions
   module Hash
     def to_query
       uri = Addressable::URI.new
-      uri.query_values = self
+      uri.query_values = self.stringify
       uri.query = Addressable::URI.normalize_component(uri.query)
       Addressable::URI.encode(uri.query)
+    end
+
+    def stringify
+      Marshal.load(Marshal.dump(self)).stringify!
+    end
+
+    # Destructively convert all keys and values to strings
+    def stringify!
+      keys.each do |key|
+        new_key = key.to_s
+        self[new_key] = delete(key)
+        if self[new_key].is_a?(Hash)
+          self[new_key].stringify!
+        else
+          self[new_key] = delete(new_key).to_s
+        end
+      end
+      self
     end
   end
 

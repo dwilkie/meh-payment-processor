@@ -10,7 +10,7 @@ Feature: Payment Request Notification verification
 
     Then the response should be 200
 
-  Scenario: Payment notification verification is made with correct parameters but for a payment request which is not completed
+  Scenario: Payment notification verification is made with correct parameters but for a payment request where the notification has not yet been sent
     Given a payment request exists with id: 2423
 
     When a payment notification verification request is received for 2423

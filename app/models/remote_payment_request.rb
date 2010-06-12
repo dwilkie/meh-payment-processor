@@ -36,6 +36,7 @@ class RemotePaymentRequest
       :follow_redirects => false,
       :headers => {"Content-Type" => "application/x-www-form-urlencoded"}
     )
+    payment_request.update(:notification_sent_at => Time.now)
     @raw_response.code
   end
 end

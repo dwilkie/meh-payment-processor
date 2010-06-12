@@ -9,6 +9,7 @@ class PaymentRequest
   property :verified_at, DateTime
   property :sent_for_processing_at, DateTime
   property :completed_at, DateTime
+  property :notification_sent_at, DateTime
   property :status, String
   timestamps :at
 
@@ -39,6 +40,10 @@ class PaymentRequest
 
   def sent_for_processing?
     !sent_for_processing_at.nil?
+  end
+
+  def notification_sent?
+    !notification_sent_at.nil?
   end
 
   def completed?
