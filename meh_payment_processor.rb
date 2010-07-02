@@ -37,6 +37,10 @@ class MehPaymentProcessor < Sinatra::Base
 
   set :skip_forgery_protection, [ "/payment_requests", /^\/tasks\/.+$/ ]
 
+  get '/tasks/ping' do
+    200
+  end
+
   put '/tasks/verify/payment_requests/:id' do
     payment_request = PaymentRequest.get(params["id"])
     remote_payment_request = RemotePaymentRequest.new(
@@ -67,6 +71,17 @@ class MehPaymentProcessor < Sinatra::Base
     RemotePaymentRequest.new(
       app_settings['remote_application']['uri']
     ).notify(payment_request)
+  end
+
+  get '/cron/ping' do
+    5.times do |i|
+      AppEngine::Labs::TaskQueue.add(
+        nil,
+        :url => "/tasks/ping",
+        :method => 'GET',
+        :countdown => (i + 1) * 10
+      )
+    end
   end
 
   post '/payment_requests' do

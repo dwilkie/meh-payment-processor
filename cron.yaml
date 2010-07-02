@@ -1,0 +1,5 @@
+cron:
+- description: keep alive
+  url: /cron/ping
+  schedule: every 1 minutes synchronized
+

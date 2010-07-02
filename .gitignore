@@ -5,6 +5,7 @@ WEB-INF/**
 public/**
 !public/stylesheets
 !public/javascripts
+!public/favicon.ico
 .gems
 .bundle
 vendor
