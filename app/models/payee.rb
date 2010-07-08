@@ -7,7 +7,8 @@ class Payee
   property :cents, Integer, :default => 0
   property :currency, String
 
-  validates_presence_of :currency, :unless => Proc.new {|p| p.maximum_amount.zero?}
+  validates_presence_of :currency,
+                        :unless => Proc.new {|p| p.cents.blank? || p.cents == 0}
 
   CURRENCIES = %w[ AUD BRL CAD CZK DKK EUR HKD HUF ILS JPY MYR MXN NOK NZD
                           PHP PLN GBP SGD SEK CHF TWD THB USD ]
@@ -18,7 +19,7 @@ class Payee
 
   def maximum_amount
     self.currency = nil if self.currency.blank?
-    Money.new(self.cents, self.currency)
+    Money.new(self.cents, self.currency) if currency
   end
 
   def name
@@ -26,7 +27,7 @@ class Payee
   end
 
   def pay_unlimited?
-    maximum_amount.zero?
+    maximum_amount.blank? || maximum_amount.zero?
   end
 
   def self.authorization_errors(params)

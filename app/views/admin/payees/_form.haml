@@ -44,7 +44,6 @@
         %label{:for => "payee_maximum_amount"}
           Maximum amount
           - amount = @payee.maximum_amount
-          - amount = amount.zero? ? nil : amount
         %input#payee_maximum_amount{        |
           :name => "payee[maximum_amount]", |
           :type => "text",                  |
@@ -89,3 +88,4 @@
         }                           |
         or
         %a{:href => "/admin/payees"} Cancel
+
