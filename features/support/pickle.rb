@@ -1,9 +1,6 @@
 # Shamelessly copied from ianwhite/pickle
 # http://github.com/ianwhite/pickle.git
-require 'active_support/inflector/inflections'
-require 'active_support/inflector/methods'
 module Pickle
-  include ActiveSupport::Inflector
   # given a string like 'foo: "bar", bar: "baz"'
   # returns {"foo" => "bar", "bar" => "baz"}
   def parse_fields(fields)
@@ -27,12 +24,9 @@ module Pickle
     end
   end
 
-  def find_model(a_model_name, fields = nil)
-    model_class = ActiveSupport::Inflector.inflections do |inflect|
-      constantize(classify(a_model_name))
-    end
+  def find_model(model_name, fields = nil)
     fields = parse_fields(fields)
-    model_class.first(fields)
+    model_name.classify.constantize.first(fields)
   end
 
   def find_model!(a_model_name, fields = nil)
